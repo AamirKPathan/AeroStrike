@@ -31,8 +31,3 @@ Manage altitude, aim precisely, and conserve missiles to complete the mission.
 
 ## ⚙️ Hosting
 Built for **HTML5/WebGL**, playable instantly on **GitHub Pages**.
-
-## 🚫 Common Pitfalls
-- Make sure your GitHub Pages link actually launches the game.  
-- Verify all assets are licensed (CC0, free, or original).  
-- Test your deployed build before submission.
