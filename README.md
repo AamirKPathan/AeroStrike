@@ -1,11 +1,11 @@
-# Sink the Cruiser
+# AeroStrike
 
 ## 🕹️ What It Is
 A fast‑paced aerial combat game where you pilot a fighter jet on a mission to **sink an enemy cruiser**.  
 Play directly in your browser — no downloads required.
 
 ## 🌐 Play It Here
-👉 [Play on GitHub Pages](https://aamirkpathan.github.io/AeroStrike/)
+👉 [Play on Itch.io](https://aamirkpathan.github.io/AeroStrike/)
 
 ## 🎮 Controls
 | Action | Key |
