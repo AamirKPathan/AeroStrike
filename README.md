@@ -26,10 +26,5 @@ Play directly in your browser — no downloads required.
 Destroy the enemy cruiser before your jet takes critical damage.  
 Manage altitude, aim precisely, and conserve missiles to complete the mission.
 
-## 🖼️ Screenshots
-![Gameplay](images/your-image-name.png)
-![HUD](images/hud.png)
-![Cruiser](images/cruiser.png)
-
 ## ⚙️ Hosting
 Built for **HTML5/WebGL**, playable instantly on **GitHub Pages**.
