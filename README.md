@@ -27,4 +27,4 @@ Destroy the enemy cruiser before your jet takes critical damage.
 Manage altitude, aim precisely, and conserve missiles to complete the mission.
 
 ## ⚙️ Hosting
-Built for **HTML5/WebGL**, playable instantly on **GitHub Pages**.
+Built for **HTML5/WebGL**, playable instantly on **Itch.io**.
