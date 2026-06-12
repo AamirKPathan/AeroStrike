@@ -5,7 +5,7 @@ A fast‑paced aerial combat game where you pilot a fighter jet on a mission to 
 Play directly in your browser — no downloads required.
 
 ## 🌐 Play It Here
-👉 [Play on GitHub Pages](https://your‑github‑pages‑link‑here)
+👉 [Play on GitHub Pages](https://aamirkpathan.github.io/AeroStrike/)
 
 ## 🎮 Controls
 | Action | Key |
