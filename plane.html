@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Donvally water ways</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="plane.css">
+</head>
+
+<body>
+
+    <div id="startScreen" class="overlay">
+        <div class="menu-panel">
+            <h1>AERO<span class="title-accent">STRIKE</span></h1>
+            <p class="subtitle">TACTICAL AIR-TO-SURFACE PROTOCOL</p>
+            <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                <button class="btn-mission" onclick="startGame()">SCRAMBLE JET</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="gameUI">
+        <div id="fxFlash"></div>
+        <div id="crosshair">+</div>
+        <div id="lockOnUI">
+            <div class="lock-text">LOCKED</div>
+        </div>
+        <div id="controlsHelp">A/D: STEER &bull; UP/DOWN: PITCH &bull; <span class="highlight-blue">CLICK SHIP:
+                LOCK</span> &bull; <span class="highlight">Z: ZOOM</span> &bull; SPACE: FIRE</div>
+
+        <div id="objectiveHud" class="hud-panel">
+            <div class="hud-label" id="modeTitle" style="color:#ff3333;">MISSION: LEVEL <span id="lvlText">1</span>
+            </div>
+            <div class="hud-value" id="modeObjective" style="font-size: 22px;">SINK THE CRUISER</div>
+            <div class="bar-wrapper" style="height: 6px; border:none;">
+                <div class="enemy-health-bar" id="enemyHpBar"></div>
+            </div>
+        </div>
+
+        <div id="radarUI">
+            <div id="radarGrid"></div>
+            <div class="radar-scan"></div>
+            <div id="radarCenter"></div>
+            <div id="enemyBlip"></div>
+        </div>
+
+        <div id="endScreen">
+            <div id="endMessage">AIRCRAFT DESTROYED</div>
+            <div id="endSub">MISSION FAILED</div>
+            <button class="btn-mission" onclick="location.reload()" style="margin-top: 20px;">RETRY MISSION</button>
+        </div>
+
+        <div id="levelScreen">
+            <div id="levelMessage">TARGET SINKING</div>
+            <div id="levelSub">PREPARE FOR NEXT SORTIE</div>
+        </div>
+
+        <div id="flightHud" class="hud-panel">
+            <div class="hud-label">ALTITUDE (FT)</div>
+            <div class="hud-value" id="altText">0000</div>
+            <div class="hud-label" style="margin-top: 15px;">AIRSPEED (KTS)</div>
+            <div class="hud-value" id="spdText">000</div>
+            <div class="bar-wrapper">
+                <div class="throttle-bar" id="throttleBar"></div>
+            </div>
+        </div>
+
+        <div id="statusHud" class="hud-panel">
+            <div class="hud-label">INTEGRITY</div>
+            <div class="bar-wrapper" style="margin-top: 5px; margin-bottom: 15px;">
+                <div class="health-bar" id="hpBar"></div>
+            </div>
+            <div class="hud-label">MISSILES</div>
+            <div class="hud-value" id="bombText" style="color: #ffaa00; font-size:26px; margin-bottom:10px;">10 / 10
+            </div>
+            <div class="hud-label">GEAR</div>
+            <div class="hud-value" id="gearText" style="font-size:20px;">DOWN</div>
+        </div>
+
+        <div id="warningText">STALL WARNING</div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="plane.js"></script>
+</body>
+
+</html>
