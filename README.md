@@ -40,7 +40,7 @@ The tactical Head-Up Display (HUD) provides critical flight data:
 *   **Radar**: A 3D-to-2D mapped radar system showing the enemy cruiser (Red) and hostile jets (Green).
 *   **Landing Gear**: Automated gear system that deploys during low-altitude carrier approaches.
 
-![Hud Rade](/media/)
+![Hud Radar](/media/)
 ---
 
 ## 🧭 Mission Objective
