@@ -158,8 +158,7 @@ AeroStrike now includes a wide range of real‑time systems, all implemented in 
 - Score system  
 - Settings menu  
 - Mobile controls  
-- More particle effects  
-- Title screen and pause menu  
+- More particle effects   
 
 ---
 
