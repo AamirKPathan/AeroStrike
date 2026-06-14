@@ -1291,6 +1291,14 @@
 
                     m.mesh.position.add(m.vel);
                     m.mesh.lookAt(m.mesh.position.clone().add(m.vel));
+                    // Missile warning tone
+                    if (warningCooldown <= 0) {
+                        if (m.mesh.position.distanceTo(planeGrp.position) < 300) {
+                            missileWarning.currentTime = 0;
+                            missileWarning.play();
+                            warningCooldown = 60; // 1 second cooldown
+                        }
+                    }
 
                     m.life--;
                     if (m.life <= 0) {
