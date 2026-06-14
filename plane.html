@@ -6,64 +6,404 @@
     <title>Donvally water ways</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     <style>
-        /* === GLOBAL STYLES & TACTICAL HUD === */
-        body { margin: 0; overflow: hidden; background-color: #87CEEB; color: #fff; font-family: 'Montserrat', sans-serif; user-select: none; }
-        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; text-align: center; }
-        
-        #startScreen { background: rgba(0, 15, 30, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
-        .menu-panel { background: rgba(5, 15, 20, 0.9); padding: 50px; border-radius: 4px; border: 1px solid rgba(0, 200, 100, 0.5); box-shadow: 0 0 50px rgba(0, 200, 100, 0.2); }
-        
-        h1 { font-size: 80px; margin: 0; text-transform: uppercase; letter-spacing: 2px; color: #ffffff; text-shadow: 0 0 20px rgba(0,255,150,0.8); }
-        .title-accent { color: #00ff88; }
-        p.subtitle { font-family: 'Share Tech Mono', monospace; font-size: 16px; color: #88ccaa; letter-spacing: 4px; margin-bottom: 40px; margin-top: 10px; }
-        
-        button { padding: 15px 35px; font-size: 16px; font-family: 'Montserrat', sans-serif; font-weight: 800; border: none; border-radius: 2px; cursor: pointer; transition: all 0.2s ease; text-transform: uppercase; letter-spacing: 1px; color: #fff; }
-        button:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); filter: brightness(1.2); }
-        .btn-mission { background: #006633; border: 1px solid #00ff88; }
+    :root {
+        --bg: #050910;
+        --hud-bg: rgba(5, 10, 18, 0.9);
+        --hud-border: rgba(120, 190, 255, 0.4);
+        --accent: #5fd0ff;
+        --accent-soft: #8fdcff;
+        --danger: #ff4b5c;
+        --text-main: #f5f7fa;
+        --text-muted: #9aa4b5;
+        --radar-ring: rgba(143, 220, 255, 0.25);
+    }
 
-        /* === GAME UI === */
-        #gameUI { display: none; }
-        #controlsHelp { position: absolute; bottom: 20px; width: 100%; text-align: center; pointer-events: none; z-index: 10; font-family: 'Share Tech Mono', monospace; color: rgba(255,255,255,0.8); font-size: 14px; letter-spacing: 2px; text-shadow: 1px 1px 2px #000;}
-        .highlight { color: #ffaa00; font-weight: bold; }
-        .highlight-blue { color: #00ccff; font-weight: bold; }
-        
-        #endScreen, #levelScreen { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); flex-direction: column; justify-content: center; align-items: center; z-index: 50; }
-        #endMessage, #levelMessage { font-size: 70px; margin-bottom: 10px; letter-spacing: 4px; text-align: center; }
-        #endMessage { color: #ff3333; }
-        #levelMessage { color: #00ff88; text-shadow: 0 0 20px rgba(0,255,150,0.5); }
-        #endSub, #levelSub { font-family: 'Share Tech Mono', monospace; font-size: 24px; margin-bottom: 40px; color: #aaa; text-align: center;}
+    * {
+        box-sizing: border-box;
+    }
 
-        .hud-panel { position: absolute; pointer-events: none; z-index: 10; font-family: 'Share Tech Mono', monospace; background: rgba(0, 15, 10, 0.7); padding: 15px 20px; border-radius: 4px; border: 1px solid rgba(0,255,150,0.2); box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        #flightHud { bottom: 40px; left: 40px; width: 180px; }
-        #statusHud { bottom: 40px; right: 40px; width: 180px; text-align: right; }
-        #objectiveHud { top: 30px; left: 50%; transform: translateX(-50%); width: 350px; text-align: center; border-bottom: 3px solid #ff3333; }
-        
-        #radarUI { position: absolute; top: 30px; right: 40px; width: 150px; height: 150px; background: rgba(0, 20, 10, 0.6); border-radius: 50%; border: 2px solid #00ff88; box-shadow: 0 0 15px rgba(0,255,150,0.2); display: flex; justify-content: center; align-items: center; z-index: 10; overflow: hidden; }
-        #radarGrid { position: absolute; width: 100%; height: 100%; border-radius: 50%; background-image: radial-gradient(rgba(0,255,150,0.4) 1px, transparent 1px), radial-gradient(rgba(0,255,150,0.4) 1px, transparent 1px); background-size: 30px 30px; }
-        #radarCenter { position: absolute; width: 4px; height: 4px; background: #00ff88; border-radius: 50%; box-shadow: 0 0 5px #00ff88; }
-        #enemyBlip { position: absolute; width: 8px; height: 8px; background: #ff3333; border-radius: 50%; box-shadow: 0 0 10px #ff3333; transition: transform 0.1s linear; display: none; }
-        .radar-scan { position: absolute; width: 50%; height: 50%; top: 0; left: 50%; background: linear-gradient(to right, rgba(0,255,150,0), rgba(0,255,150,0.5)); transform-origin: bottom left; animation: spin 2s linear infinite; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+    body {
+        margin: 0;
+        overflow: hidden;
+        background-color: #0b1724;
+        color: var(--text-main);
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        user-select: none;
+    }
 
-        .hud-value { font-size: 32px; color: #fff; margin-top: 5px; text-shadow: 1px 1px 0 #000; }
-        .hud-label { color: #88ccaa; font-size: 12px; letter-spacing: 1px; }
-        
-        .bar-wrapper { width: 100%; background: rgba(0,0,0,0.8); height: 12px; border-radius: 2px; margin-top: 15px; border: 1px solid rgba(255,255,255,0.2); overflow: hidden;}
-        .throttle-bar { height: 100%; background: #00ff88; width: 0%; transition: 0.1s; }
-        .health-bar { height: 100%; background: #00ccff; width: 100%; transition: 0.2s; }
-        .enemy-health-bar { height: 6px; background: #ff3333; width: 100%; transition: 0.2s; margin-top: 10px; }
-        
-        #warningText { position: absolute; top: 30%; width: 100%; text-align: center; color: #ff0033; font-size: 50px; font-weight: 800; opacity: 0; transition: opacity 0.2s; text-shadow: 0 2px 10px rgba(0,0,0,0.8); z-index: 5; pointer-events: none; letter-spacing: 6px;}
-        #fxFlash { position: absolute; top:0; left:0; width:100%; height:100%; background:red; opacity:0; pointer-events:none; z-index:4; transition: opacity 0.1s; }
+    /* Overlays */
+    .overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+        text-align: center;
+        background:
+            radial-gradient(circle at top, rgba(95, 208, 255, 0.12), transparent 55%),
+            radial-gradient(circle at bottom, rgba(10, 20, 35, 0.9), rgba(5, 10, 18, 1));
+    }
 
-        #lockOnUI { position: absolute; top: 0; left: 0; width: 60px; height: 60px; border: 2px solid #ff3333; transform: translate(-50%, -50%); pointer-events: none; z-index: 5; display: none; }
-        #lockOnUI::before, #lockOnUI::after { content: ''; position: absolute; background: #ff3333; }
-        #lockOnUI::before { width: 100%; height: 2px; top: 50%; left: 0; transform: translateY(-50%); opacity: 0.5; }
-        #lockOnUI::after { width: 2px; height: 100%; top: 0; left: 50%; transform: translateX(-50%); opacity: 0.5; }
-        .lock-text { position: absolute; top: 65px; width: 100%; text-align: center; color: #ff3333; font-family: 'Share Tech Mono', monospace; font-size: 12px; font-weight: bold; }
-        
-        #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: rgba(255,255,255,0.5); font-family: monospace; font-size: 20px; pointer-events: none; z-index: 5;}
-    </style>
+    #startScreen {
+        backdrop-filter: blur(10px);
+    }
+
+    .menu-panel {
+        background: rgba(5, 10, 18, 0.95);
+        padding: 40px 48px;
+        border-radius: 10px;
+        border: 1px solid rgba(143, 220, 255, 0.35);
+    }
+
+    h1 {
+        font-size: 56px;
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--text-main);
+    }
+
+    .title-accent {
+        color: var(--accent);
+    }
+
+    p.subtitle {
+        margin-top: 12px;
+        margin-bottom: 32px;
+        font-size: 13px;
+        letter-spacing: 0.35em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+    }
+
+    button {
+        padding: 12px 28px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #0b1724;
+        background: var(--accent);
+        transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+        background: #7bdbff;
+    }
+
+    .btn-mission {
+        border-color: transparent;
+    }
+
+    /* Game UI root */
+    #gameUI {
+        display: none;
+    }
+
+    #controlsHelp {
+        position: absolute;
+        bottom: 18px;
+        width: 100%;
+        text-align: center;
+        pointer-events: none;
+        z-index: 10;
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: rgba(230, 236, 245, 0.8);
+    }
+
+    .highlight {
+        color: var(--danger);
+        font-weight: 600;
+    }
+
+    .highlight-blue {
+        color: var(--accent);
+        font-weight: 600;
+    }
+
+    /* End / Level screens */
+    #endScreen,
+    #levelScreen {
+        display: none;
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top, rgba(255, 75, 92, 0.08), rgba(5, 10, 18, 0.96));
+        backdrop-filter: blur(6px);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 50;
+    }
+
+    #endMessage,
+    #levelMessage {
+        font-size: 40px;
+        letter-spacing: 0.25em;
+        text-align: center;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    #endMessage {
+        color: var(--danger);
+    }
+
+    #levelMessage {
+        color: var(--accent);
+    }
+
+    #endSub,
+    #levelSub {
+        font-size: 16px;
+        color: var(--text-muted);
+        margin-bottom: 28px;
+        text-align: center;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+    }
+
+    /* HUD panels */
+    .hud-panel {
+        position: absolute;
+        pointer-events: none;
+        z-index: 10;
+        background: var(--hud-bg);
+        padding: 12px 14px;
+        border-radius: 8px;
+        border: 1px solid var(--hud-border);
+        backdrop-filter: blur(6px);
+    }
+
+    #flightHud {
+        bottom: 32px;
+        left: 32px;
+        width: 180px;
+    }
+
+    #statusHud {
+        bottom: 32px;
+        right: 32px;
+        width: 180px;
+        text-align: right;
+    }
+
+    #objectiveHud {
+        top: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 320px;
+        text-align: center;
+        border-bottom: none;
+    }
+
+    .hud-label {
+        font-size: 11px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+    }
+
+    .hud-value {
+        font-size: 24px;
+        margin-top: 4px;
+        color: var(--text-main);
+    }
+
+    .bar-wrapper {
+        width: 100%;
+        background: rgba(3, 7, 13, 0.9);
+        height: 10px;
+        border-radius: 999px;
+        margin-top: 10px;
+        overflow: hidden;
+    }
+
+    .throttle-bar {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent-soft), var(--accent));
+        width: 0%;
+        transition: width 0.1s ease-out;
+    }
+
+    .health-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #7bffb4, #3be0ff);
+        width: 100%;
+        transition: width 0.2s ease-out;
+    }
+
+    .enemy-health-bar {
+        height: 6px;
+        background: linear-gradient(90deg, var(--danger), #ff9aa5);
+        width: 100%;
+        transition: width 0.2s ease-out;
+        border-radius: 999px;
+    }
+
+    /* Radar */
+    #radarUI {
+        position: absolute;
+        top: 24px;
+        right: 32px;
+        width: 140px;
+        height: 140px;
+        background: rgba(5, 10, 18, 0.9);
+        border-radius: 50%;
+        border: 1px solid var(--hud-border);
+        box-shadow: 0 0 0 1px rgba(95, 208, 255, 0.08);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+        overflow: hidden;
+    }
+
+    #radarGrid {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background-image:
+            radial-gradient(var(--radar-ring) 1px, transparent 1px),
+            radial-gradient(var(--radar-ring) 1px, transparent 1px);
+        background-size: 28px 28px;
+    }
+
+    #radarCenter {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: var(--accent);
+        border-radius: 50%;
+    }
+
+    #enemyBlip {
+        position: absolute;
+        width: 7px;
+        height: 7px;
+        background: var(--danger);
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(255, 75, 92, 0.7);
+        transition: transform 0.1s linear;
+        display: none;
+    }
+
+    .radar-scan {
+        position: absolute;
+        width: 50%;
+        height: 50%;
+        top: 0;
+        left: 50%;
+        background: linear-gradient(to right, transparent, rgba(95, 208, 255, 0.5));
+        transform-origin: bottom left;
+        animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Warnings & FX */
+    #warningText {
+        position: absolute;
+        top: 30%;
+        width: 100%;
+        text-align: center;
+        color: var(--danger);
+        font-size: 32px;
+        font-weight: 700;
+        opacity: 0;
+        transition: opacity 0.18s ease-out;
+        letter-spacing: 0.35em;
+        text-transform: uppercase;
+        z-index: 5;
+        pointer-events: none;
+    }
+
+    #fxFlash {
+        position: absolute;
+        inset: 0;
+        background: #ff4b5c;
+        opacity: 0;
+        pointer-events: none;
+        z-index: 4;
+        transition: opacity 0.1s ease-out;
+    }
+
+    /* Lock-on & crosshair */
+    #lockOnUI {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 56px;
+        height: 56px;
+        border: 1px solid var(--danger);
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 5;
+        display: none;
+        border-radius: 6px;
+    }
+
+    #lockOnUI::before,
+    #lockOnUI::after {
+        content: '';
+        position: absolute;
+        background: var(--danger);
+        opacity: 0.4;
+    }
+
+    #lockOnUI::before {
+        width: 100%;
+        height: 1px;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+    }
+
+    #lockOnUI::after {
+        width: 1px;
+        height: 100%;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .lock-text {
+        position: absolute;
+        top: 64px;
+        width: 100%;
+        text-align: center;
+        color: var(--danger);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+    }
+
+    #crosshair {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: rgba(230, 236, 245, 0.6);
+        font-family: monospace;
+        font-size: 18px;
+        pointer-events: none;
+        z-index: 5;
+    }
+</style>
+
 </head>
 <body>
 
