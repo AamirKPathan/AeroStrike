@@ -42,7 +42,7 @@ The tactical Head-Up Display (HUD) provides critical flight data:
 
 ![Hud Radar](/media/)
 ![Altimeter and ASI](/media/)
-![Hud Radar](/media/)
+![Ammo, Gear, And Health](/media/)
 ---
 
 ## 🧭 Mission Objective
