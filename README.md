@@ -41,6 +41,8 @@ The tactical Head-Up Display (HUD) provides critical flight data:
 *   **Landing Gear**: Automated gear system that deploys during low-altitude carrier approaches.
 
 ![Hud Radar](/media/)
+![Altimeter and ASI](/media/)
+![Hud Radar](/media/)
 ---
 
 ## 🧭 Mission Objective
