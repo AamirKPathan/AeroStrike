@@ -156,7 +156,7 @@ AeroStrike now includes a wide range of real‑time systems, all implemented in 
 - Choosable difficulty levels
 - Additional enemy ships or aircraft types
 - Score system  
-- Mul
+- Multiplayer Combat
 - Settings menu  
 - Mobile controls  
 - More particle effects   
