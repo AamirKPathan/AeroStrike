@@ -923,9 +923,9 @@
 
             if (gameState === "playing") {
                 if (isPaused) {
-        renderer.render(scene, camera);
-        return;
-    }
+                    renderer.render(scene, camera);
+                    return;
+                }
                 if (keys.keyw) throttle = Math.min(1.0, throttle + 0.005);
                 if (keys.keys) throttle = Math.max(0.0, throttle - 0.01);
                 // Afterburner boost (Shift)
