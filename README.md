@@ -169,4 +169,4 @@ AeroStrike now includes a wide range of real‑time systems, all implemented in 
 Built for HTML5 Canvas and deployed on Itch.io for instant play.
 
 ## 🎥 Gameplay Video
-[![Watch the video]](https://youtu.be/P-ykU11OTvg)
+[Watch the video](https://youtu.be/P-ykU11OTvg)
