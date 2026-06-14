@@ -170,3 +170,7 @@ Built for HTML5 Canvas and deployed on Itch.io for instant play.
 
 ## 🎥 Gameplay Video
 [![Watch the video](https://img.youtube.com/vi/YOUR_VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID)
+
+git add .
+git commit -m "Updated AeroStrike build"
+git push origin main
