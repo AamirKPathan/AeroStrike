@@ -971,6 +971,7 @@
                 if (keys.keyw) throttle = Math.min(1.0, throttle + 0.005);
                 if (keys.keys) throttle = Math.max(0.0, throttle - 0.01);
                 let currentMaxSpeed = throttle > 0.8 ? currentBaseSpeed * 1.5 : currentBaseSpeed;
+                speed += ((throttle * currentMaxSpeed) - speed) * 0.015;
 
 
                 afterburner.visible = throttle > 0.8 && !isGrounded;
