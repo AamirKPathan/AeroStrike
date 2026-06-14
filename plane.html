@@ -1116,21 +1116,21 @@
                 if (planeGrp.position.y <= groundY) {
                     planeGrp.position.y = groundY; isGrounded = true;
                     // Check if on carrier deck
-            if (onDeck) {
+                if (onDeck) {
 
-                // Rearm + repair
-                bombCount = 10;
-                playerHp = playerMaxHp;
+                    // Rearm + repair
+                    bombCount = 10;
+                    playerHp = playerMaxHp;
 
-                document.getElementById('hpBar').style.width = '100%';
-                document.getElementById('bombText').innerText = bombCount + " / 10";
+                    document.getElementById('hpBar').style.width = '100%';
+                    document.getElementById('bombText').innerText = bombCount + " / 10";
 
-                // HUD message
-                document.getElementById('objectiveHud').innerText = "REARMING COMPLETE";
-                setTimeout(() => {
-                    document.getElementById('objectiveHud').innerText = "OBJECTIVE: ENGAGE HOSTILES";
-                }, 2000);
-            }
+                    // HUD message
+                    document.getElementById('objectiveHud').innerText = "REARMING COMPLETE";
+                    setTimeout(() => {
+                        document.getElementById('objectiveHud').innerText = "OBJECTIVE: ENGAGE HOSTILES";
+                    }, 2000);
+                }
 
                     document.getElementById('gearText').innerText = "DOWN";
                     const eul = new THREE.Euler().setFromQuaternion(planeGrp.quaternion, 'YXZ');
