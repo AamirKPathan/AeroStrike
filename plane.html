@@ -1229,6 +1229,33 @@
                         if (playerHp <= 0) triggerCrash("SHOT DOWN");
                     }
                 }
+                // === ENEMY MISSILES ===
+                for (let i = enemyMissiles.length - 1; i >= 0; i--) {
+                    let m = enemyMissiles[i];
+
+                    const targetDir = planeGrp.position.clone().sub(m.mesh.position).normalize();
+                    m.vel.lerp(targetDir.multiplyScalar(25), 0.05);
+
+                    m.mesh.position.add(m.vel);
+                    m.mesh.lookAt(m.mesh.position.clone().add(m.vel));
+
+                    m.life--;
+                    if (m.life <= 0) {
+                        scene.remove(m.mesh);
+                        enemyMissiles.splice(i, 1);
+                        continue;
+                    }
+
+                    if (m.mesh.position.distanceTo(planeGrp.position) < 20) {
+                        flashDamage();
+                        playerHp -= 20;
+                        document.getElementById('hpBar').style.width = (playerHp/playerMaxHp)*100 + '%';
+                        scene.remove(m.mesh);
+                        enemyMissiles.splice(i, 1);
+
+                        if (playerHp <= 0) triggerCrash("HIT BY MISSILE");
+                    }
+                }
 
                 document.getElementById('throttleBar').style.width = (throttle * 100) + '%';
                 document.getElementById('throttleBar').style.background = throttle > 0.8 ? '#00ccff' : '#00ff88';
