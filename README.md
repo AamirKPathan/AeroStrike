@@ -5,63 +5,149 @@ Built entirely with **HTML, CSS, and JavaScript** in a single file — lightweig
 
 ---
 
-## 🌐 Play the Game
-👉 **Itch.io:** https://aamir-pa2009.itch.io/aerostrike
+## 🌐 Play the Game  
+https://aamir-pa2009.itch.io/aerostrike
 
 ---
 
 ## 🎮 Controls
 
-| Action        | Key            |
-|---------------|----------------|
-| Steer         | **A / D**      |
-| Pitch         | **Up / Down**  |
-| Lock Target   | **Click Ship** |
-| Zoom          | **Z**          |
-| Fire Missile  | **Space**      |
+| Action            | Key            |
+|------------------|----------------|
+| Steer            | A / D          |
+| Pitch            | Up / Down      |
+| Throttle         | W / S          |
+| Fire Bomb        | Space          |
+| Deploy Flares    | F              |
+| Zoom             | Z              |
+| Camera Toggle    | C              |
+| Lock Target      | Click Ship     |
 
 ---
 
 ## 📊 HUD Overview
 
-- **Altitude (ft)** and **Airspeed (kts)** — left side  
-- **Integrity** (health bar) and **Missile Count** — right side  
-- **Radar** — top‑right, shows enemy positions  
-- **Mission Objective** — displayed at the top: *Sink the Cruiser*
+- Altitude (ft)  
+- Airspeed (kts)  
+- Integrity (health bar)  
+- Bomb Count  
+- Missile Warning Indicator  
+- Radar showing enemy jets and cruiser  
+- Mission Objective  
+- Gear Status (auto‑gear)
 
 ---
 
 ## 🧭 Objective
 
 Destroy the enemy cruiser before your jet takes critical damage.  
-Manage altitude, dodge incoming fire, and conserve missiles to complete the mission.
+Survive enemy jets, avoid homing missiles, manage ammo, and return to the carrier to rearm.
 
 ---
 
-## 🛠️ How It’s Built
+# 🛠️ Updated Systems & Techniques Used
 
-AeroStrike is created using **pure HTML, CSS, and JavaScript** — no engines or frameworks.  
-Everything from movement physics to collision detection is hand‑coded.
-
-### Techniques Used
-- Canvas‑based rendering  
-- Sprite animation  
-- Basic physics simulation (velocity, pitch, drag)  
-- Enemy AI tracking  
-- Custom HUD rendering  
-- Sound effects triggered via JavaScript events  
+AeroStrike now includes a wide range of real‑time systems, all implemented in pure HTML, CSS, and JavaScript.
 
 ---
 
-## ✨ Features
+## ✈️ Flight & Physics
 
-- Smooth jet movement with pitch + roll  
-- Lock‑on targeting system  
-- Missile firing + explosion effects  
-- Health, radar, and altitude indicators  
-- Enemy cruiser with active defense  
-- Win/lose conditions  
-- Fully browser‑playable (desktop)
+- Smooth pitch, roll, yaw, and throttle simulation  
+- Auto‑landing gear (down on ground, up in air)  
+- Touchdown smoothing  
+- Ground detection using `groundY`  
+- Carrier deck detection (`onDeck`)  
+- Crash detection for hard landings or overspeed  
+
+---
+
+## 💥 Weapons & Countermeasures
+
+### Bombs
+- Distance‑based collision detection with the enemy cruiser (`enemyShip`)  
+- Configurable cruiser HP  
+- Explosion effects  
+
+### Enemy Missiles
+- Homing logic using vector math  
+- Smooth steering and orientation  
+- Missile lifetime and cleanup  
+- Missile proximity warning tone  
+
+### Flares
+- Burst flare system  
+- Missiles can retarget flares  
+- Flare lifetime and decay  
+
+---
+
+## 🤖 Enemy AI
+
+### Enemy Jets
+- Primitive‑mesh fighter models  
+- Pursuit AI  
+- Missile firing logic  
+- Increasing difficulty per level  
+- Radar blips  
+
+### Enemy Cruiser
+- HP system  
+- Bomb collision detection  
+- Radar blip  
+- Mission completion trigger  
+
+---
+
+## 📡 Radar System
+
+- 2D radar overlay  
+- World‑to‑radar coordinate scaling  
+- Clamped blip positions  
+- Tracks jets and cruiser  
+
+---
+
+## 🔊 Audio Systems
+
+- Missile warning tone  
+- Explosion sounds  
+- UI feedback sounds  
+
+---
+
+## 🛬 Carrier Operations
+
+- Auto‑gear down on landing  
+- Safe landing detection  
+- Rearming system:
+  - Restores bombs  
+  - Restores HP  
+  - HUD message: “REARMING COMPLETE”  
+
+---
+
+## 🧩 Rendering & Architecture
+
+- Manual 3D object groups (jets, missiles, flares)  
+- Frame‑based update loop  
+- Efficient array cleanup  
+- HUD built with HTML/CSS  
+- Particle effects  
+- No external libraries required  
+
+---
+
+# ✨ Features
+
+- Smooth jet movement  
+- Dogfighting enemy jets  
+- Homing missiles + flares  
+- Carrier landing + rearming  
+- Radar tracking  
+- Explosion effects  
+- Level progression  
+- Fully browser‑playable  
 
 ---
 
@@ -69,44 +155,14 @@ Everything from movement physics to collision detection is hand‑coded.
 
 - Difficulty levels  
 - Additional enemy ships or aircraft  
-- Score system + combos  
-- Settings menu (sound toggle, sensitivity)  
+- Score system  
+- Settings menu  
 - Mobile controls  
-- Particle effects (smoke, afterburner, water splashes)  
-- Title screen + pause menu  
-
----
-
-## 📸 Screenshots
-
-### **In‑Game Action**
-[![Gameplay Screenshot](screenshots/gameplay-thumb.png)](screenshots/gameplay.png)  
-*Dogfighting above the ocean while approaching the enemy cruiser.*
-
-### **HUD & Target Lock**
-[![HUD Screenshot](screenshots/hud-thumb.png)](screenshots/hud.png)  
-*Altitude, speed, radar, and missile indicators during a lock‑on.*
-
-### **Missile Impact**
-[![Explosion Screenshot](screenshots/explosion-thumb.png)](screenshots/explosion.png)  
-*Direct hit on the cruiser with explosion effects.*
-
-> **Tip:**  
-> - Place your full‑size images in a `/screenshots` folder  
-> - Create smaller versions named `*-thumb.png` for the thumbnails  
-> - GitHub will automatically make them clickable
-
----
-
-## 🎥 Demo Video
-
-👉 **Watch the Gameplay Demo:**  
-https://your-demo-video-link-here.com
-
-(You can replace this with a YouTube link, Google Drive link, or Itch‑hosted video.)
+- More particle effects  
+- Title screen and pause menu  
 
 ---
 
 ## 📦 Hosting
 
-Built for **HTML5 Canvas**, deployed on **Itch.io** for instant play.
+Built for HTML5 Canvas and deployed on Itch.io for instant play.
