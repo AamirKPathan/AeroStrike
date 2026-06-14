@@ -970,9 +970,6 @@
                 }
                 if (keys.keyw) throttle = Math.min(1.0, throttle + 0.005);
                 if (keys.keys) throttle = Math.max(0.0, throttle - 0.01);
-                // Afterburner boost (Shift)
-                boostActive = (keys.shiftleft || keys.shiftright) && !isGrounded && throttle > 0.7;
-                boostMultiplier = boostActive ? 2.0 : 1.0;
 
                 let base = throttle > 0.8 ? currentBaseSpeed * 1.5 : currentBaseSpeed;
                 let currentMaxSpeed = base * boostMultiplier;
