@@ -807,6 +807,11 @@
         window.onkeyup = e => {
             if (keys[e.code.toLowerCase()] !== undefined) keys[e.code.toLowerCase()] = 0;
             if (e.code === 'Space' && gameState === 'playing' && bombCount > 0) fireMissile();
+            if (e.code === "KeyP" && gameState === "playing") {
+    isPaused = !isPaused;
+    document.getElementById('pauseScreen').style.display = isPaused ? 'flex' : 'none';
+}
+
         };
 
         // MOUSE RAYCASTING FOR TARGET LOCK
