@@ -628,56 +628,56 @@
             document.getElementById('lockOnUI').style.display = 'none';
         }
         function createEnemyJet() {
-    const jet = new THREE.Group();
+            const jet = new THREE.Group();
 
-        const body = new THREE.Mesh(
-            new THREE.CylinderGeometry(1.2, 1.2, 18, 12).rotateX(Math.PI / 2),
-            matDark
-        );
-        jet.add(body);
+            const body = new THREE.Mesh(
+                new THREE.CylinderGeometry(1.2, 1.2, 18, 12).rotateX(Math.PI / 2),
+                matDark
+            );
+            jet.add(body);
 
-        const nose = new THREE.Mesh(
-            new THREE.ConeGeometry(1.2, 4, 12).rotateX(Math.PI / 2),
-            matDark
-        );
-        nose.position.z = -11;
-        jet.add(nose);
+            const nose = new THREE.Mesh(
+                new THREE.ConeGeometry(1.2, 4, 12).rotateX(Math.PI / 2),
+                matDark
+            );
+            nose.position.z = -11;
+            jet.add(nose);
 
-        const tail = new THREE.Mesh(
-            new THREE.ConeGeometry(1.0, 3, 12).rotateX(-Math.PI / 2),
-            matDark
-        );
-        tail.position.z = 11;
-        jet.add(tail);
+            const tail = new THREE.Mesh(
+                new THREE.ConeGeometry(1.0, 3, 12).rotateX(-Math.PI / 2),
+                matDark
+            );
+            tail.position.z = 11;
+            jet.add(tail);
 
-        const wingGeo = new THREE.BoxGeometry(14, 0.4, 4);
-        const leftWing = new THREE.Mesh(wingGeo, matDark);
-        leftWing.position.set(-7, 0, -1);
-        leftWing.rotation.y = 0.25;
-        jet.add(leftWing);
+            const wingGeo = new THREE.BoxGeometry(14, 0.4, 4);
+            const leftWing = new THREE.Mesh(wingGeo, matDark);
+            leftWing.position.set(-7, 0, -1);
+            leftWing.rotation.y = 0.25;
+            jet.add(leftWing);
 
-        const rightWing = leftWing.clone();
-        rightWing.position.x = 7;
-        rightWing.rotation.y = -0.25;
-        jet.add(rightWing);
+            const rightWing = leftWing.clone();
+            rightWing.position.x = 7;
+            rightWing.rotation.y = -0.25;
+            jet.add(rightWing);
 
-        const stabGeo = new THREE.BoxGeometry(0.6, 4, 3);
-        const leftStab = new THREE.Mesh(stabGeo, matDark);
-        leftStab.position.set(-2, 2, 8);
-        leftStab.rotation.x = -0.4;
-        jet.add(leftStab);
+            const stabGeo = new THREE.BoxGeometry(0.6, 4, 3);
+            const leftStab = new THREE.Mesh(stabGeo, matDark);
+            leftStab.position.set(-2, 2, 8);
+            leftStab.rotation.x = -0.4;
+            jet.add(leftStab);
 
-        const rightStab = leftStab.clone();
-        rightStab.position.x = 2;
-        jet.add(rightStab);
+            const rightStab = leftStab.clone();
+            rightStab.position.x = 2;
+            jet.add(rightStab);
 
-        jet.scale.set(1.2, 1.2, 1.2);
-        jet.position.set(0, 120, -2000);
+            jet.scale.set(1.2, 1.2, 1.2);
+            jet.position.set(0, 120, -2000);
 
-        jet.alive = true;
-        scene.add(jet);
-        return jet;
-    }
+            jet.alive = true;
+            scene.add(jet);
+            return jet;
+        }
 
         // AIRCRAFT
         // ==========================================
