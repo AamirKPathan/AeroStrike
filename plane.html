@@ -968,8 +968,9 @@
                 boostActive = (keys.shiftleft || keys.shiftright) && !isGrounded && throttle > 0.7;
                 boostMultiplier = boostActive ? 2.0 : 1.0;
 
-                let currentMaxSpeed = throttle > 0.8 ? currentBaseSpeed * 1.5 : currentBaseSpeed;
-                speed += ((throttle * currentMaxSpeed) - speed) * 0.015;
+                let base = throttle > 0.8 ? currentBaseSpeed * 1.5 : currentBaseSpeed;
+                let currentMaxSpeed = base * boostMultiplier;
+
 
                 afterburner.visible = throttle > 0.8 && !isGrounded;
                 if (afterburner.visible) afterburner.scale.set(1, 1 + Math.random() * 0.5, 1);
