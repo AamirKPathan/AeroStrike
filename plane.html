@@ -792,10 +792,11 @@
         const xAxis = new THREE.Vector3(1, 0, 0); const yAxis = new THREE.Vector3(0, 1, 0); const zAxis = new THREE.Vector3(0, 0, 1);
 
         const keys = {
-        keyw:0, keya:0, keys:0, keyd:0,
-        arrowup:0, arrowdown:0, arrowleft:0, arrowright:0,
-        space:0, keyf:0, keyz:0,
-        shiftleft:0, shiftright:0, keyp:0
+            keyw:0, keya:0, keys:0, keyd:0,
+            arrowup:0, arrowdown:0, arrowleft:0, arrowright:0,
+            space:0, keyf:0, keyz:0,
+            shiftleft:0, shiftright:0,
+            keyp:0
         };
 
         window.onkeydown = e => { if (keys[e.code.toLowerCase()] !== undefined) keys[e.code.toLowerCase()] = 1; };
