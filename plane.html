@@ -830,15 +830,22 @@
             scene.add(missile);
         }
 
-        function dropFlares() {
-            for (let i = 0; i < 6; i++) {
-                const flare = new THREE.Mesh(new THREE.SphereGeometry(1.2, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffaa55, transparent: true }));
-                flare.position.copy(planeGrp.position);
-                flare.position.x += (Math.random() - 0.5) * 10; flare.position.y += (Math.random() - 0.5) * 5; flare.position.z += (Math.random() - 0.5) * 10;
-                flares.push({ mesh: flare, life: 80 });
-                scene.add(flare);
-            }
-        }
+                function dropFlares() {
+                    for (let i = 0; i < 8; i++) {
+                        const flare = new THREE.Mesh(new THREE.SphereGeometry(1.5, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffaa00, transparent: true }));
+                        flare.position.copy(planeGrp.position);
+                        
+                        // Eject flares behind and slightly to the sides
+                        const ejectDir = new THREE.Vector3((Math.random() - 0.5) * 15, -5, 10).applyQuaternion(planeGrp.quaternion);
+                        
+                        flares.push({ 
+                            mesh: flare, 
+                            vel: ejectDir,
+                            life: 120 // Increased flare life
+                        });
+                        scene.add(flare);
+                    }
+                }
 
         function flashDamage() {
             const fx = document.getElementById('fxFlash'); fx.style.opacity = 0.4;
@@ -1125,7 +1132,20 @@
 
                 for (let i = enemyMissiles.length - 1; i >= 0; i--) {
                     let m = enemyMissiles[i];
-                    const targetDir = planeGrp.position.clone().sub(m.mesh.position).normalize();
+                    
+                    // TARGETING LOGIC: Priority to flares
+                    let currentTargetPos = planeGrp.position.clone();
+                    let closestFlareDist = Infinity;
+                    
+                    for (let f of flares) {
+                        let d = m.mesh.position.distanceTo(f.mesh.position);
+                        if (d < 500 && d < closestFlareDist) { // Detection range for flares
+                            closestFlareDist = d;
+                            currentTargetPos = f.mesh.position.clone();
+                        }
+                    }
+
+                    const targetDir = currentTargetPos.sub(m.mesh.position).normalize();
                     m.vel.lerp(targetDir.multiplyScalar(25), 0.05);
                     m.mesh.position.add(m.vel); m.mesh.lookAt(m.mesh.position.clone().add(m.vel));
                     if (warningCooldown <= 0 && m.mesh.position.distanceTo(planeGrp.position) < 300) {
@@ -1177,7 +1197,15 @@
                 }
             });
             for (let i = flares.length - 1; i >= 0; i--) {
-                let f = flares[i]; f.life--; f.mesh.material.opacity = f.life / 80;
+                let f = flares[i]; 
+                f.life--; 
+                f.mesh.position.add(f.vel);
+                f.vel.multiplyScalar(0.96); // Slow down flares over time
+                f.mesh.material.opacity = f.life / 120;
+                
+                // Add flicker effect
+                f.mesh.scale.setScalar(1 + Math.random() * 0.5);
+                
                 if (f.life <= 0) { scene.remove(f.mesh); flares.splice(i, 1); }
             }
             warningCooldown--;
