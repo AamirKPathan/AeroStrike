@@ -25,6 +25,8 @@ Built with **JavaScript** and the **Three.js WebGL library**, AeroStrike deliver
 | **Lock Target**    | Click Target    |
 | **Pause Game**     | P               |
 
+![Controls Images](https://example.com/cat.png)
+
 ---
 
 ## 📊 HUD & Systems Overview
