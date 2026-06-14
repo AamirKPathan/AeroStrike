@@ -1,410 +1,413 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Donvally water ways</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
     <style>
-    :root {
-        --bg: #050910;
-        --hud-bg: rgba(5, 10, 18, 0.9);
-        --hud-border: rgba(120, 190, 255, 0.4);
-        --accent: #5fd0ff;
-        --accent-soft: #8fdcff;
-        --danger: #ff4b5c;
-        --text-main: #f5f7fa;
-        --text-muted: #9aa4b5;
-        --radar-ring: rgba(143, 220, 255, 0.25);
-    }
-
-    * {
-        box-sizing: border-box;
-    }
-
-    body {
-        margin: 0;
-        overflow: hidden;
-        background-color: #0b1724;
-        color: var(--text-main);
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        user-select: none;
-    }
-
-    /* Overlays */
-    .overlay {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 100;
-        text-align: center;
-        background:
-            radial-gradient(circle at top, rgba(95, 208, 255, 0.12), transparent 55%),
-            radial-gradient(circle at bottom, rgba(10, 20, 35, 0.9), rgba(5, 10, 18, 1));
-    }
-
-    #startScreen {
-        backdrop-filter: blur(10px);
-    }
-
-    .menu-panel {
-        background: rgba(5, 10, 18, 0.95);
-        padding: 40px 48px;
-        border-radius: 10px;
-        border: 1px solid rgba(143, 220, 255, 0.35);
-    }
-
-    h1 {
-        font-size: 56px;
-        margin: 0;
-        text-transform: uppercase;
-        letter-spacing: 0.18em;
-        color: var(--text-main);
-    }
-
-    .title-accent {
-        color: var(--accent);
-    }
-
-    p.subtitle {
-        margin-top: 12px;
-        margin-bottom: 32px;
-        font-size: 13px;
-        letter-spacing: 0.35em;
-        text-transform: uppercase;
-        color: var(--text-muted);
-    }
-
-    button {
-        padding: 12px 28px;
-        font-size: 13px;
-        font-weight: 600;
-        border-radius: 999px;
-        border: 1px solid transparent;
-        cursor: pointer;
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-        color: #0b1724;
-        background: var(--accent);
-        transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
-    }
-
-    button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
-        background: #7bdbff;
-    }
-
-    .btn-mission {
-        border-color: transparent;
-    }
-
-    /* Game UI root */
-    #gameUI {
-        display: none;
-    }
-
-    #controlsHelp {
-        position: absolute;
-        bottom: 18px;
-        width: 100%;
-        text-align: center;
-        pointer-events: none;
-        z-index: 10;
-        font-size: 12px;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        color: rgba(230, 236, 245, 0.8);
-    }
-
-    .highlight {
-        color: var(--danger);
-        font-weight: 600;
-    }
-
-    .highlight-blue {
-        color: var(--accent);
-        font-weight: 600;
-    }
-
-    /* End / Level screens */
-    #endScreen,
-    #levelScreen {
-        display: none;
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(circle at top, rgba(255, 75, 92, 0.08), rgba(5, 10, 18, 0.96));
-        backdrop-filter: blur(6px);
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        z-index: 50;
-    }
-
-    #endMessage,
-    #levelMessage {
-        font-size: 40px;
-        letter-spacing: 0.25em;
-        text-align: center;
-        text-transform: uppercase;
-        margin-bottom: 8px;
-    }
-
-    #endMessage {
-        color: var(--danger);
-    }
-
-    #levelMessage {
-        color: var(--accent);
-    }
-
-    #endSub,
-    #levelSub {
-        font-size: 16px;
-        color: var(--text-muted);
-        margin-bottom: 28px;
-        text-align: center;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-    }
-
-    /* HUD panels */
-    .hud-panel {
-        position: absolute;
-        pointer-events: none;
-        z-index: 10;
-        background: var(--hud-bg);
-        padding: 12px 14px;
-        border-radius: 8px;
-        border: 1px solid var(--hud-border);
-        backdrop-filter: blur(6px);
-    }
-
-    #flightHud {
-        bottom: 32px;
-        left: 32px;
-        width: 180px;
-    }
-
-    #statusHud {
-        bottom: 32px;
-        right: 32px;
-        width: 180px;
-        text-align: right;
-    }
-
-    #objectiveHud {
-        top: 24px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 320px;
-        text-align: center;
-        border-bottom: none;
-    }
-
-    .hud-label {
-        font-size: 11px;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        color: var(--text-muted);
-    }
-
-    .hud-value {
-        font-size: 24px;
-        margin-top: 4px;
-        color: var(--text-main);
-    }
-
-    .bar-wrapper {
-        width: 100%;
-        background: rgba(3, 7, 13, 0.9);
-        height: 10px;
-        border-radius: 999px;
-        margin-top: 10px;
-        overflow: hidden;
-    }
-
-    .throttle-bar {
-        height: 100%;
-        background: linear-gradient(90deg, var(--accent-soft), var(--accent));
-        width: 0%;
-        transition: width 0.1s ease-out;
-    }
-
-    .health-bar {
-        height: 100%;
-        background: linear-gradient(90deg, #7bffb4, #3be0ff);
-        width: 100%;
-        transition: width 0.2s ease-out;
-    }
-
-    .enemy-health-bar {
-        height: 6px;
-        background: linear-gradient(90deg, var(--danger), #ff9aa5);
-        width: 100%;
-        transition: width 0.2s ease-out;
-        border-radius: 999px;
-    }
-
-    /* Radar */
-    #radarUI {
-        position: absolute;
-        top: 24px;
-        right: 32px;
-        width: 140px;
-        height: 140px;
-        background: rgba(5, 10, 18, 0.9);
-        border-radius: 50%;
-        border: 1px solid var(--hud-border);
-        box-shadow: 0 0 0 1px rgba(95, 208, 255, 0.08);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 10;
-        overflow: hidden;
-    }
-
-    #radarGrid {
-        position: absolute;
-        inset: 0;
-        border-radius: 50%;
-        background-image:
-            radial-gradient(var(--radar-ring) 1px, transparent 1px),
-            radial-gradient(var(--radar-ring) 1px, transparent 1px);
-        background-size: 28px 28px;
-    }
-
-    #radarCenter {
-        position: absolute;
-        width: 4px;
-        height: 4px;
-        background: var(--accent);
-        border-radius: 50%;
-    }
-
-    #enemyBlip {
-        position: absolute;
-        width: 7px;
-        height: 7px;
-        background: var(--danger);
-        border-radius: 50%;
-        box-shadow: 0 0 10px rgba(255, 75, 92, 0.7);
-        transition: transform 0.1s linear;
-        display: none;
-    }
-
-    .radar-scan {
-        position: absolute;
-        width: 50%;
-        height: 50%;
-        top: 0;
-        left: 50%;
-        background: linear-gradient(to right, transparent, rgba(95, 208, 255, 0.5));
-        transform-origin: bottom left;
-        animation: spin 2s linear infinite;
-    }
-
-    @keyframes spin {
-        to {
-            transform: rotate(360deg);
+        :root {
+            --bg: #050910;
+            --hud-bg: rgba(5, 10, 18, 0.9);
+            --hud-border: rgba(120, 190, 255, 0.4);
+            --accent: #5fd0ff;
+            --accent-soft: #8fdcff;
+            --danger: #ff4b5c;
+            --text-main: #f5f7fa;
+            --text-muted: #9aa4b5;
+            --radar-ring: rgba(143, 220, 255, 0.25);
         }
-    }
 
-    /* Warnings & FX */
-    #warningText {
-        position: absolute;
-        top: 30%;
-        width: 100%;
-        text-align: center;
-        color: var(--danger);
-        font-size: 32px;
-        font-weight: 700;
-        opacity: 0;
-        transition: opacity 0.18s ease-out;
-        letter-spacing: 0.35em;
-        text-transform: uppercase;
-        z-index: 5;
-        pointer-events: none;
-    }
+        * {
+            box-sizing: border-box;
+        }
 
-    #fxFlash {
-        position: absolute;
-        inset: 0;
-        background: #ff4b5c;
-        opacity: 0;
-        pointer-events: none;
-        z-index: 4;
-        transition: opacity 0.1s ease-out;
-    }
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #0b1724;
+            color: var(--text-main);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            user-select: none;
+        }
 
-    /* Lock-on & crosshair */
-    #lockOnUI {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 56px;
-        height: 56px;
-        border: 1px solid var(--danger);
-        transform: translate(-50%, -50%);
-        pointer-events: none;
-        z-index: 5;
-        display: none;
-        border-radius: 6px;
-    }
+        /* Overlays */
+        .overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            text-align: center;
+            background:
+                radial-gradient(circle at top, rgba(95, 208, 255, 0.12), transparent 55%),
+                radial-gradient(circle at bottom, rgba(10, 20, 35, 0.9), rgba(5, 10, 18, 1));
+        }
 
-    #lockOnUI::before,
-    #lockOnUI::after {
-        content: '';
-        position: absolute;
-        background: var(--danger);
-        opacity: 0.4;
-    }
+        #startScreen {
+            backdrop-filter: blur(10px);
+        }
 
-    #lockOnUI::before {
-        width: 100%;
-        height: 1px;
-        top: 50%;
-        left: 0;
-        transform: translateY(-50%);
-    }
+        .menu-panel {
+            background: rgba(5, 10, 18, 0.95);
+            padding: 40px 48px;
+            border-radius: 10px;
+            border: 1px solid rgba(143, 220, 255, 0.35);
+        }
 
-    #lockOnUI::after {
-        width: 1px;
-        height: 100%;
-        top: 0;
-        left: 50%;
-        transform: translateX(-50%);
-    }
+        h1 {
+            font-size: 56px;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            color: var(--text-main);
+        }
 
-    .lock-text {
-        position: absolute;
-        top: 64px;
-        width: 100%;
-        text-align: center;
-        color: var(--danger);
-        font-size: 11px;
-        font-weight: 600;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-    }
+        .title-accent {
+            color: var(--accent);
+        }
 
-    #crosshair {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: rgba(230, 236, 245, 0.6);
-        font-family: monospace;
-        font-size: 18px;
-        pointer-events: none;
-        z-index: 5;
-    }
-</style>
+        p.subtitle {
+            margin-top: 12px;
+            margin-bottom: 32px;
+            font-size: 13px;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        button {
+            padding: 12px 28px;
+            font-size: 13px;
+            font-weight: 600;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #0b1724;
+            background: var(--accent);
+            transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+            background: #7bdbff;
+        }
+
+        .btn-mission {
+            border-color: transparent;
+        }
+
+        /* Game UI root */
+        #gameUI {
+            display: none;
+        }
+
+        #controlsHelp {
+            position: absolute;
+            bottom: 18px;
+            width: 100%;
+            text-align: center;
+            pointer-events: none;
+            z-index: 10;
+            font-size: 12px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: rgba(230, 236, 245, 0.8);
+        }
+
+        .highlight {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .highlight-blue {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* End / Level screens */
+        #endScreen,
+        #levelScreen {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top, rgba(255, 75, 92, 0.08), rgba(5, 10, 18, 0.96));
+            backdrop-filter: blur(6px);
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+        }
+
+        #endMessage,
+        #levelMessage {
+            font-size: 40px;
+            letter-spacing: 0.25em;
+            text-align: center;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        #endMessage {
+            color: var(--danger);
+        }
+
+        #levelMessage {
+            color: var(--accent);
+        }
+
+        #endSub,
+        #levelSub {
+            font-size: 16px;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+            text-align: center;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        /* HUD panels */
+        .hud-panel {
+            position: absolute;
+            pointer-events: none;
+            z-index: 10;
+            background: var(--hud-bg);
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--hud-border);
+            backdrop-filter: blur(6px);
+        }
+
+        #flightHud {
+            bottom: 32px;
+            left: 32px;
+            width: 180px;
+        }
+
+        #statusHud {
+            bottom: 32px;
+            right: 32px;
+            width: 180px;
+            text-align: right;
+        }
+
+        #objectiveHud {
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 320px;
+            text-align: center;
+            border-bottom: none;
+        }
+
+        .hud-label {
+            font-size: 11px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .hud-value {
+            font-size: 24px;
+            margin-top: 4px;
+            color: var(--text-main);
+        }
+
+        .bar-wrapper {
+            width: 100%;
+            background: rgba(3, 7, 13, 0.9);
+            height: 10px;
+            border-radius: 999px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .throttle-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-soft), var(--accent));
+            width: 0%;
+            transition: width 0.1s ease-out;
+        }
+
+        .health-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #7bffb4, #3be0ff);
+            width: 100%;
+            transition: width 0.2s ease-out;
+        }
+
+        .enemy-health-bar {
+            height: 6px;
+            background: linear-gradient(90deg, var(--danger), #ff9aa5);
+            width: 100%;
+            transition: width 0.2s ease-out;
+            border-radius: 999px;
+        }
+
+        /* Radar */
+        #radarUI {
+            position: absolute;
+            top: 24px;
+            right: 32px;
+            width: 140px;
+            height: 140px;
+            background: rgba(5, 10, 18, 0.9);
+            border-radius: 50%;
+            border: 1px solid var(--hud-border);
+            box-shadow: 0 0 0 1px rgba(95, 208, 255, 0.08);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        #radarGrid {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background-image:
+                radial-gradient(var(--radar-ring) 1px, transparent 1px),
+                radial-gradient(var(--radar-ring) 1px, transparent 1px);
+            background-size: 28px 28px;
+        }
+
+        #radarCenter {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        #enemyBlip {
+            position: absolute;
+            width: 7px;
+            height: 7px;
+            background: var(--danger);
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 75, 92, 0.7);
+            transition: transform 0.1s linear;
+            display: none;
+        }
+
+        .radar-scan {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            top: 0;
+            left: 50%;
+            background: linear-gradient(to right, transparent, rgba(95, 208, 255, 0.5));
+            transform-origin: bottom left;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Warnings & FX */
+        #warningText {
+            position: absolute;
+            top: 30%;
+            width: 100%;
+            text-align: center;
+            color: var(--danger);
+            font-size: 32px;
+            font-weight: 700;
+            opacity: 0;
+            transition: opacity 0.18s ease-out;
+            letter-spacing: 0.35em;
+            text-transform: uppercase;
+            z-index: 5;
+            pointer-events: none;
+        }
+
+        #fxFlash {
+            position: absolute;
+            inset: 0;
+            background: #ff4b5c;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 4;
+            transition: opacity 0.1s ease-out;
+        }
+
+        /* Lock-on & crosshair */
+        #lockOnUI {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 56px;
+            height: 56px;
+            border: 1px solid var(--danger);
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 5;
+            display: none;
+            border-radius: 6px;
+        }
+
+        #lockOnUI::before,
+        #lockOnUI::after {
+            content: '';
+            position: absolute;
+            background: var(--danger);
+            opacity: 0.4;
+        }
+
+        #lockOnUI::before {
+            width: 100%;
+            height: 1px;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+        }
+
+        #lockOnUI::after {
+            width: 1px;
+            height: 100%;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .lock-text {
+            position: absolute;
+            top: 64px;
+            width: 100%;
+            text-align: center;
+            color: var(--danger);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        #crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(230, 236, 245, 0.6);
+            font-family: monospace;
+            font-size: 18px;
+            pointer-events: none;
+            z-index: 5;
+        }
+    </style>
 
 </head>
+
 <body>
 
     <div id="startScreen" class="overlay">
@@ -420,13 +423,19 @@
     <div id="gameUI">
         <div id="fxFlash"></div>
         <div id="crosshair">+</div>
-        <div id="lockOnUI"><div class="lock-text">LOCKED</div></div>
-        <div id="controlsHelp">A/D: STEER &bull; UP/DOWN: PITCH &bull; <span class="highlight-blue">CLICK SHIP: LOCK</span> &bull; <span class="highlight">Z: ZOOM</span> &bull; SPACE: FIRE</div>
-        
+        <div id="lockOnUI">
+            <div class="lock-text">LOCKED</div>
+        </div>
+        <div id="controlsHelp">A/D: STEER &bull; UP/DOWN: PITCH &bull; <span class="highlight-blue">CLICK SHIP:
+                LOCK</span> &bull; <span class="highlight">Z: ZOOM</span> &bull; SPACE: FIRE</div>
+
         <div id="objectiveHud" class="hud-panel">
-            <div class="hud-label" id="modeTitle" style="color:#ff3333;">MISSION: LEVEL <span id="lvlText">1</span></div>
+            <div class="hud-label" id="modeTitle" style="color:#ff3333;">MISSION: LEVEL <span id="lvlText">1</span>
+            </div>
             <div class="hud-value" id="modeObjective" style="font-size: 22px;">SINK THE CRUISER</div>
-            <div class="bar-wrapper" style="height: 6px; border:none;"><div class="enemy-health-bar" id="enemyHpBar"></div></div>
+            <div class="bar-wrapper" style="height: 6px; border:none;">
+                <div class="enemy-health-bar" id="enemyHpBar"></div>
+            </div>
         </div>
 
         <div id="radarUI">
@@ -452,14 +461,19 @@
             <div class="hud-value" id="altText">0000</div>
             <div class="hud-label" style="margin-top: 15px;">AIRSPEED (KTS)</div>
             <div class="hud-value" id="spdText">000</div>
-            <div class="bar-wrapper"><div class="throttle-bar" id="throttleBar"></div></div>
+            <div class="bar-wrapper">
+                <div class="throttle-bar" id="throttleBar"></div>
+            </div>
         </div>
-        
+
         <div id="statusHud" class="hud-panel">
             <div class="hud-label">INTEGRITY</div>
-            <div class="bar-wrapper" style="margin-top: 5px; margin-bottom: 15px;"><div class="health-bar" id="hpBar"></div></div>
+            <div class="bar-wrapper" style="margin-top: 5px; margin-bottom: 15px;">
+                <div class="health-bar" id="hpBar"></div>
+            </div>
             <div class="hud-label">MISSILES</div>
-            <div class="hud-value" id="bombText" style="color: #ffaa00; font-size:26px; margin-bottom:10px;">10 / 10</div>
+            <div class="hud-value" id="bombText" style="color: #ffaa00; font-size:26px; margin-bottom:10px;">10 / 10
+            </div>
             <div class="hud-label">GEAR</div>
             <div class="hud-value" id="gearText" style="font-size:20px;">DOWN</div>
         </div>
@@ -472,36 +486,36 @@
         // === AUDIO SYSTEM ===
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
-        function initAudio() { if(!audioCtx) audioCtx = new AudioContext(); if(audioCtx.state === 'suspended') audioCtx.resume(); }
+        function initAudio() { if (!audioCtx) audioCtx = new AudioContext(); if (audioCtx.state === 'suspended') audioCtx.resume(); }
         function sysAudio(type) {
             initAudio();
             const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
             osc.connect(gain); gain.connect(audioCtx.destination);
-            if(type === 'click') {
+            if (type === 'click') {
                 osc.type = 'square'; osc.frequency.setValueAtTime(400, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1);
                 gain.gain.setValueAtTime(0.2, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
                 osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-            } else if(type === 'explode') {
+            } else if (type === 'explode') {
                 osc.type = 'sawtooth'; osc.frequency.setValueAtTime(100, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 1.5);
                 gain.gain.setValueAtTime(1.0, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5);
                 osc.start(); osc.stop(audioCtx.currentTime + 1.5);
-            } else if(type === 'splash') {
+            } else if (type === 'splash') {
                 osc.type = 'sine'; osc.frequency.setValueAtTime(300, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.8);
                 gain.gain.setValueAtTime(0.5, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
                 osc.start(); osc.stop(audioCtx.currentTime + 0.8);
-            } else if(type === 'pew') {
+            } else if (type === 'pew') {
                 osc.type = 'square'; osc.frequency.setValueAtTime(800, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(200, audioCtx.currentTime + 0.1);
                 gain.gain.setValueAtTime(0.1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
                 osc.start(); osc.stop(audioCtx.currentTime + 0.1);
-            } else if(type === 'flak') {
+            } else if (type === 'flak') {
                 osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.3);
                 gain.gain.setValueAtTime(0.4, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
                 osc.start(); osc.stop(audioCtx.currentTime + 0.3);
-            } else if(type === 'launch') {
+            } else if (type === 'launch') {
                 osc.type = 'sine'; osc.frequency.setValueAtTime(50, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.5);
                 gain.gain.setValueAtTime(0.8, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.0);
                 osc.start(); osc.stop(audioCtx.currentTime + 1.0);
-            } else if(type === 'lock') {
+            } else if (type === 'lock') {
                 osc.type = 'square'; osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
                 gain.gain.setValueAtTime(0.3, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
                 osc.start(); osc.stop(audioCtx.currentTime + 0.2);
@@ -509,30 +523,30 @@
         }
 
         // === GRAPHICS & SCENE ===
-        const scene = new THREE.Scene(); 
-        scene.fog = new THREE.FogExp2(0x88aabb, 0.0001); 
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x88aabb, 0.0001);
         const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 5, 40000);
-        
-        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" }); 
-        renderer.setSize(window.innerWidth, window.innerHeight); 
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); 
-        renderer.shadowMap.enabled = true; 
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+        renderer.shadowMap.enabled = true;
         document.body.appendChild(renderer.domElement);
 
-        let screenShake = 0; 
-        let gameState = "menu"; 
+        let screenShake = 0;
+        let gameState = "menu";
         let level = 1;
         let isTargetLocked = false;
 
         // ENVIRONMENT
-        const sky = new THREE.Mesh(new THREE.SphereGeometry(30000, 32, 15), new THREE.MeshBasicMaterial({color: 0x4488dd, side: THREE.BackSide}));
+        const sky = new THREE.Mesh(new THREE.SphereGeometry(30000, 32, 15), new THREE.MeshBasicMaterial({ color: 0x4488dd, side: THREE.BackSide }));
         scene.add(sky);
-        
-        const sun = new THREE.Mesh(new THREE.SphereGeometry(500, 32, 32), new THREE.MeshBasicMaterial({color: 0xffffee}));
+
+        const sun = new THREE.Mesh(new THREE.SphereGeometry(500, 32, 32), new THREE.MeshBasicMaterial({ color: 0xffffee }));
         sun.position.set(4000, 8000, -15000); scene.add(sun);
-        
-        scene.add(new THREE.HemisphereLight(0xe6f2ff, 0x112233, 0.6)); 
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2); 
+
+        scene.add(new THREE.HemisphereLight(0xe6f2ff, 0x112233, 0.6));
+        const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
         dirLight.position.set(4000, 8000, -15000); dirLight.castShadow = true;
         scene.add(dirLight);
 
@@ -540,16 +554,16 @@
         const cloudGeo = new THREE.SphereGeometry(1, 7, 7);
         const cloudMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1, transparent: true, opacity: 0.8, flatShading: true });
         const cloudGroup = new THREE.Group();
-        for(let i=0; i<60; i++) {
+        for (let i = 0; i < 60; i++) {
             const cluster = new THREE.Group();
-            const puffs = Math.floor(Math.random()*5) + 3;
-            for(let j=0; j<puffs; j++) {
+            const puffs = Math.floor(Math.random() * 5) + 3;
+            for (let j = 0; j < puffs; j++) {
                 const mesh = new THREE.Mesh(cloudGeo, cloudMat);
-                mesh.position.set((Math.random()-0.5)*400, (Math.random()-0.5)*100, (Math.random()-0.5)*400);
-                const s = Math.random()*200 + 100; mesh.scale.set(s, s*0.6, s);
+                mesh.position.set((Math.random() - 0.5) * 400, (Math.random() - 0.5) * 100, (Math.random() - 0.5) * 400);
+                const s = Math.random() * 200 + 100; mesh.scale.set(s, s * 0.6, s);
                 cluster.add(mesh);
             }
-            cluster.position.set((Math.random()-0.5)*20000, Math.random()*2000 + 2000, (Math.random()-0.5)*20000);
+            cluster.position.set((Math.random() - 0.5) * 20000, Math.random() * 2000 + 2000, (Math.random() - 0.5) * 20000);
             cloudGroup.add(cluster);
         }
         scene.add(cloudGroup);
@@ -576,8 +590,8 @@
 
         // CARRIER
         const carrierGrp = new THREE.Group(); scene.add(carrierGrp);
-        const hullMat = new THREE.MeshStandardMaterial({color: 0x3a3a44, roughness: 0.7});
-        const deckMat = new THREE.MeshStandardMaterial({color: 0x1a1a1a, roughness: 0.9});
+        const hullMat = new THREE.MeshStandardMaterial({ color: 0x3a3a44, roughness: 0.7 });
+        const deckMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.9 });
         const flightDeck = new THREE.Mesh(new THREE.BoxGeometry(80, 2, 1400), deckMat);
         flightDeck.position.y = 40; carrierGrp.add(flightDeck);
         const hull = new THREE.Mesh(new THREE.BoxGeometry(70, 40, 1380), hullMat);
@@ -585,36 +599,36 @@
 
         // ENEMY WARSHIP
         const enemyShip = new THREE.Group(); scene.add(enemyShip);
-        const eHull = new THREE.Mesh(new THREE.BoxGeometry(46, 25, 450), new THREE.MeshStandardMaterial({color: 0x444455}));
+        const eHull = new THREE.Mesh(new THREE.BoxGeometry(46, 25, 450), new THREE.MeshStandardMaterial({ color: 0x444455 }));
         eHull.position.y = 12.5; enemyShip.add(eHull);
-        const eDeck = new THREE.Mesh(new THREE.BoxGeometry(42, 26, 430), new THREE.MeshStandardMaterial({color: 0x222222}));
+        const eDeck = new THREE.Mesh(new THREE.BoxGeometry(42, 26, 430), new THREE.MeshStandardMaterial({ color: 0x222222 }));
         eDeck.position.y = 13; enemyShip.add(eDeck);
-        const eBridge = new THREE.Mesh(new THREE.BoxGeometry(22, 35, 60), new THREE.MeshStandardMaterial({color: 0x555566}));
+        const eBridge = new THREE.Mesh(new THREE.BoxGeometry(22, 35, 60), new THREE.MeshStandardMaterial({ color: 0x555566 }));
         eBridge.position.set(0, 40, -50); enemyShip.add(eBridge);
 
         const turrets = [];
         const turretGeo = new THREE.BoxGeometry(14, 8, 18);
-        const barrelGeo = new THREE.CylinderGeometry(1.5, 1.5, 30).rotateX(Math.PI/2);
-        const tMat = new THREE.MeshStandardMaterial({color: 0x333344});
-        const turretPositions = [ {x:0, y:30, z:120}, {x:0, y:30, z:60}, {x:0, y:35, z:-140} ];
+        const barrelGeo = new THREE.CylinderGeometry(1.5, 1.5, 30).rotateX(Math.PI / 2);
+        const tMat = new THREE.MeshStandardMaterial({ color: 0x333344 });
+        const turretPositions = [{ x: 0, y: 30, z: 120 }, { x: 0, y: 30, z: 60 }, { x: 0, y: 35, z: -140 }];
         turretPositions.forEach(pos => {
             const tGroup = new THREE.Group(); tGroup.position.set(pos.x, pos.y, pos.z);
             const base = new THREE.Mesh(turretGeo, tMat); tGroup.add(base);
-            const b1 = new THREE.Mesh(barrelGeo, new THREE.MeshStandardMaterial({color: 0x111111})); b1.position.set(-3, 2, 15); tGroup.add(b1);
-            const b2 = new THREE.Mesh(barrelGeo, new THREE.MeshStandardMaterial({color: 0x111111})); b2.position.set(3, 2, 15); tGroup.add(b2);
+            const b1 = new THREE.Mesh(barrelGeo, new THREE.MeshStandardMaterial({ color: 0x111111 })); b1.position.set(-3, 2, 15); tGroup.add(b1);
+            const b2 = new THREE.Mesh(barrelGeo, new THREE.MeshStandardMaterial({ color: 0x111111 })); b2.position.set(3, 2, 15); tGroup.add(b2);
             enemyShip.add(tGroup); turrets.push(tGroup);
         });
 
         let enemyAlive = true; let enemyMaxHp = 10; let enemyHp = 10;
         function respawnEnemy() {
-            enemyAlive = true; 
+            enemyAlive = true;
             isTargetLocked = false;
-            enemyMaxHp = 5 + (level * 2); 
+            enemyMaxHp = 5 + (level * 2);
             enemyHp = enemyMaxHp;
             let dist = 10000 + (level * 2000);
             let angle = Math.random() * Math.PI;
-            enemyShip.position.set(Math.cos(angle)*dist, 0, -Math.sin(angle)*dist);
-            enemyShip.rotation.set(0, (Math.random()-0.5)*3, 0);
+            enemyShip.position.set(Math.cos(angle) * dist, 0, -Math.sin(angle) * dist);
+            enemyShip.rotation.set(0, (Math.random() - 0.5) * 3, 0);
             enemyShip.updateMatrixWorld();
             document.getElementById('enemyBlip').style.display = 'block';
             document.getElementById('enemyHpBar').style.width = '100%';
@@ -622,194 +636,194 @@
         }
 
         // AIRCRAFT
- // ==========================================
-// AIRCRAFT (GEOMETRIC F-15 EAGLE)
-// ==========================================
-const planeGrp = new THREE.Group(); 
-scene.add(planeGrp);
+        // ==========================================
+        // AIRCRAFT (GEOMETRIC F-15 EAGLE)
+        // ==========================================
+        const planeGrp = new THREE.Group();
+        scene.add(planeGrp);
 
-// --- MATERIALS ---
-const matChassis = new THREE.MeshStandardMaterial({ color: 0x6b7782, metalness: 0.5, roughness: 0.6 });
-const matDark = new THREE.MeshStandardMaterial({ color: 0x2a353f, metalness: 0.7, roughness: 0.4 });
-const matGlass = new THREE.MeshPhysicalMaterial({ color: 0x050a10, metalness: 0.9, roughness: 0.1, transparent: true, opacity: 0.8 });
+        // --- MATERIALS ---
+        const matChassis = new THREE.MeshStandardMaterial({ color: 0x6b7782, metalness: 0.5, roughness: 0.6 });
+        const matDark = new THREE.MeshStandardMaterial({ color: 0x2a353f, metalness: 0.7, roughness: 0.4 });
+        const matGlass = new THREE.MeshPhysicalMaterial({ color: 0x050a10, metalness: 0.9, roughness: 0.1, transparent: true, opacity: 0.8 });
 
-// --- FUSELAGE & NOSE ---
-planeGrp.add(new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, 11, 32).rotateX(Math.PI/2), matChassis)); 
-planeGrp.add(new THREE.Mesh(new THREE.ConeGeometry(1.2, 5, 32).rotateX(-Math.PI/2).translate(0, 0, -8), matDark)); 
+        // --- FUSELAGE & NOSE ---
+        planeGrp.add(new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, 11, 32).rotateX(Math.PI / 2), matChassis));
+        planeGrp.add(new THREE.Mesh(new THREE.ConeGeometry(1.2, 5, 32).rotateX(-Math.PI / 2).translate(0, 0, -8), matDark));
 
-// --- COCKPIT ---
-const canopy = new THREE.Mesh(new THREE.SphereGeometry(0.8, 32, 16), matGlass);
-canopy.scale.set(1.2, 1.2, 3.5); 
-canopy.position.set(0, 0.8, -4.5);
-planeGrp.add(canopy);
+        // --- COCKPIT ---
+        const canopy = new THREE.Mesh(new THREE.SphereGeometry(0.8, 32, 16), matGlass);
+        canopy.scale.set(1.2, 1.2, 3.5);
+        canopy.position.set(0, 0.8, -4.5);
+        planeGrp.add(canopy);
 
-// --- AIR INTAKES ---
-const leftIntake = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.6, 5), matDark);
-leftIntake.position.set(-1.5, 0, -2); 
-planeGrp.add(leftIntake);
-const rightIntake = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.6, 5), matDark);
-rightIntake.position.set(1.5, 0, -2); 
-planeGrp.add(rightIntake);
+        // --- AIR INTAKES ---
+        const leftIntake = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.6, 5), matDark);
+        leftIntake.position.set(-1.5, 0, -2);
+        planeGrp.add(leftIntake);
+        const rightIntake = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.6, 5), matDark);
+        rightIntake.position.set(1.5, 0, -2);
+        planeGrp.add(rightIntake);
 
-// --- CUSTOM AERODYNAMIC SHAPES ---
-const extrudeSettings = { depth: 0.15, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.05, bevelSegments: 3 };
+        // --- CUSTOM AERODYNAMIC SHAPES ---
+        const extrudeSettings = { depth: 0.15, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.05, bevelSegments: 3 };
 
-// 1. MAIN WINGS (Swept F-15 Profile)
-const wingShape = new THREE.Shape();
-wingShape.moveTo(0, 0);       
-wingShape.lineTo(6, 4);       
-wingShape.lineTo(6, 5.5);     
-wingShape.lineTo(0, 5.5);     
-wingShape.lineTo(0, 0);       
+        // 1. MAIN WINGS (Swept F-15 Profile)
+        const wingShape = new THREE.Shape();
+        wingShape.moveTo(0, 0);
+        wingShape.lineTo(6, 4);
+        wingShape.lineTo(6, 5.5);
+        wingShape.lineTo(0, 5.5);
+        wingShape.lineTo(0, 0);
 
-const wingGeo = new THREE.ExtrudeGeometry(wingShape, extrudeSettings);
-wingGeo.rotateX(Math.PI / 2); 
+        const wingGeo = new THREE.ExtrudeGeometry(wingShape, extrudeSettings);
+        wingGeo.rotateX(Math.PI / 2);
 
-const rightWing = new THREE.Mesh(wingGeo, matChassis);
-rightWing.position.set(1, 0, -1);
-planeGrp.add(rightWing);
+        const rightWing = new THREE.Mesh(wingGeo, matChassis);
+        rightWing.position.set(1, 0, -1);
+        planeGrp.add(rightWing);
 
-const leftWing = new THREE.Mesh(wingGeo, matChassis);
-leftWing.rotation.z = Math.PI; // Mirrored
-leftWing.position.set(-1, 0, -1);
-planeGrp.add(leftWing);
+        const leftWing = new THREE.Mesh(wingGeo, matChassis);
+        leftWing.rotation.z = Math.PI; // Mirrored
+        leftWing.position.set(-1, 0, -1);
+        planeGrp.add(leftWing);
 
-// 2. REAR ELEVATORS (Stabilators)
-const elevShape = new THREE.Shape();
-elevShape.moveTo(0, 0);
-elevShape.lineTo(3.5, 2.5);
-elevShape.lineTo(3.5, 3.5);
-elevShape.lineTo(0, 3.5);
+        // 2. REAR ELEVATORS (Stabilators)
+        const elevShape = new THREE.Shape();
+        elevShape.moveTo(0, 0);
+        elevShape.lineTo(3.5, 2.5);
+        elevShape.lineTo(3.5, 3.5);
+        elevShape.lineTo(0, 3.5);
 
-const elevGeo = new THREE.ExtrudeGeometry(elevShape, extrudeSettings);
-elevGeo.rotateX(Math.PI / 2);
+        const elevGeo = new THREE.ExtrudeGeometry(elevShape, extrudeSettings);
+        elevGeo.rotateX(Math.PI / 2);
 
-const rightElev = new THREE.Mesh(elevGeo, matChassis);
-rightElev.position.set(1, 0, 4.5);
-planeGrp.add(rightElev);
+        const rightElev = new THREE.Mesh(elevGeo, matChassis);
+        rightElev.position.set(1, 0, 4.5);
+        planeGrp.add(rightElev);
 
-const leftElev = new THREE.Mesh(elevGeo, matChassis);
-leftElev.rotation.z = Math.PI;
-leftElev.position.set(-1, 0, 4.5);
-planeGrp.add(leftElev);
+        const leftElev = new THREE.Mesh(elevGeo, matChassis);
+        leftElev.rotation.z = Math.PI;
+        leftElev.position.set(-1, 0, 4.5);
+        planeGrp.add(leftElev);
 
-// 3. TWIN VERTICAL TAIL FINS
-const tailShape = new THREE.Shape();
-tailShape.moveTo(0, 0);      
-tailShape.lineTo(2.5, 3.5);  
-tailShape.lineTo(3.5, 3.6);  
-tailShape.lineTo(1.5, 0);    
+        // 3. TWIN VERTICAL TAIL FINS
+        const tailShape = new THREE.Shape();
+        tailShape.moveTo(0, 0);
+        tailShape.lineTo(2.5, 3.5);
+        tailShape.lineTo(3.5, 3.6);
+        tailShape.lineTo(1.5, 0);
 
-const tailGeo = new THREE.ExtrudeGeometry(tailShape, extrudeSettings);
-tailGeo.rotateY(-Math.PI / 2); 
+        const tailGeo = new THREE.ExtrudeGeometry(tailShape, extrudeSettings);
+        tailGeo.rotateY(-Math.PI / 2);
 
-const rightTail = new THREE.Mesh(tailGeo, matDark);
-rightTail.position.set(1.5, 1.4, 4);
-rightTail.rotation.z = -0.15; 
-planeGrp.add(rightTail);
+        const rightTail = new THREE.Mesh(tailGeo, matDark);
+        rightTail.position.set(1.5, 1.4, 4);
+        rightTail.rotation.z = -0.15;
+        planeGrp.add(rightTail);
 
-const leftTail = new THREE.Mesh(tailGeo, matDark);
-leftTail.position.set(-1.5, 1.4, 4);
-leftTail.rotation.z = 0.15; 
-planeGrp.add(leftTail);
+        const leftTail = new THREE.Mesh(tailGeo, matDark);
+        leftTail.position.set(-1.5, 1.4, 4);
+        leftTail.rotation.z = 0.15;
+        planeGrp.add(leftTail);
 
-// --- DECALS (PALESTINIAN FLAG) ---
-function createFlagDecal() {
-    const flagGrp = new THREE.Group();
-    
-    const blackMat = new THREE.MeshBasicMaterial({ color: 0x111111, side: THREE.DoubleSide });
-    const whiteMat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
-    const greenMat = new THREE.MeshBasicMaterial({ color: 0x007a3d, side: THREE.DoubleSide });
-    const redMat   = new THREE.MeshBasicMaterial({ color: 0xce1126, side: THREE.DoubleSide });
+        // --- DECALS (PALESTINIAN FLAG) ---
+        function createFlagDecal() {
+            const flagGrp = new THREE.Group();
 
-    const stripeGeo = new THREE.PlaneGeometry(1.2, 0.3);
-    const black = new THREE.Mesh(stripeGeo, blackMat);
-    black.position.y = 0.3;
-    flagGrp.add(black);
-    const white = new THREE.Mesh(stripeGeo, whiteMat);
-    flagGrp.add(white);
-    const green = new THREE.Mesh(stripeGeo, greenMat);
-    green.position.y = -0.3;
-    flagGrp.add(green);
+            const blackMat = new THREE.MeshBasicMaterial({ color: 0x111111, side: THREE.DoubleSide });
+            const whiteMat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
+            const greenMat = new THREE.MeshBasicMaterial({ color: 0x007a3d, side: THREE.DoubleSide });
+            const redMat = new THREE.MeshBasicMaterial({ color: 0xce1126, side: THREE.DoubleSide });
 
-    const triangleShape = new THREE.Shape();
-    triangleShape.moveTo(-0.6, 0.45);  
-    triangleShape.lineTo(0.1, 0);      
-    triangleShape.lineTo(-0.6, -0.45); 
-    triangleShape.lineTo(-0.6, 0.45);  
+            const stripeGeo = new THREE.PlaneGeometry(1.2, 0.3);
+            const black = new THREE.Mesh(stripeGeo, blackMat);
+            black.position.y = 0.3;
+            flagGrp.add(black);
+            const white = new THREE.Mesh(stripeGeo, whiteMat);
+            flagGrp.add(white);
+            const green = new THREE.Mesh(stripeGeo, greenMat);
+            green.position.y = -0.3;
+            flagGrp.add(green);
 
-    const triangleGeo = new THREE.ShapeGeometry(triangleShape);
-    const triangle = new THREE.Mesh(triangleGeo, redMat);
-    triangle.position.z = 0.01; 
-    flagGrp.add(triangle);
+            const triangleShape = new THREE.Shape();
+            triangleShape.moveTo(-0.6, 0.45);
+            triangleShape.lineTo(0.1, 0);
+            triangleShape.lineTo(-0.6, -0.45);
+            triangleShape.lineTo(-0.6, 0.45);
 
-    return flagGrp;
-}
+            const triangleGeo = new THREE.ShapeGeometry(triangleShape);
+            const triangle = new THREE.Mesh(triangleGeo, redMat);
+            triangle.position.z = 0.01;
+            flagGrp.add(triangle);
 
-const leftFlag = createFlagDecal();
-leftFlag.scale.set(0.6, 0.6, 0.6);
-leftFlag.position.set(-1.6, 2.0, 4.2); 
-leftFlag.rotation.y = -Math.PI / 2; 
-leftFlag.rotation.x = -0.15; 
-planeGrp.add(leftFlag);
+            return flagGrp;
+        }
 
-const rightFlag = createFlagDecal();
-rightFlag.scale.set(-0.6, 0.6, 0.6); // Negative X scale faces triangle forward
-rightFlag.position.set(1.6, 2.0, 4.2); 
-rightFlag.rotation.y = Math.PI / 2; 
-rightFlag.rotation.x = -0.15; 
-planeGrp.add(rightFlag);
+        const leftFlag = createFlagDecal();
+        leftFlag.scale.set(0.6, 0.6, 0.6);
+        leftFlag.position.set(-1.6, 2.0, 4.2);
+        leftFlag.rotation.y = -Math.PI / 2;
+        leftFlag.rotation.x = -0.15;
+        planeGrp.add(leftFlag);
 
-// --- ENGINE EXHAUSTS & AFTERBURNERS ---
-planeGrp.add(new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 2, 16).rotateX(Math.PI/2).translate(-1, 0, 6.5), matDark));
-planeGrp.add(new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 2, 16).rotateX(Math.PI/2).translate(1, 0, 6.5), matDark));
+        const rightFlag = createFlagDecal();
+        rightFlag.scale.set(-0.6, 0.6, 0.6); // Negative X scale faces triangle forward
+        rightFlag.position.set(1.6, 2.0, 4.2);
+        rightFlag.rotation.y = Math.PI / 2;
+        rightFlag.rotation.x = -0.15;
+        planeGrp.add(rightFlag);
 
-const afterburner = new THREE.Group();
-afterburner.position.set(0, 0, 7.5); 
-afterburner.rotation.x = Math.PI / 2; 
+        // --- ENGINE EXHAUSTS & AFTERBURNERS ---
+        planeGrp.add(new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 2, 16).rotateX(Math.PI / 2).translate(-1, 0, 6.5), matDark));
+        planeGrp.add(new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 2, 16).rotateX(Math.PI / 2).translate(1, 0, 6.5), matDark));
 
-const abMat = new THREE.MeshBasicMaterial({color: 0x00ccff, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending});
-const flameGeo = new THREE.ConeGeometry(0.6, 4, 16).translate(0, -2, 0); 
+        const afterburner = new THREE.Group();
+        afterburner.position.set(0, 0, 7.5);
+        afterburner.rotation.x = Math.PI / 2;
 
-const leftFlame = new THREE.Mesh(flameGeo, abMat);
-leftFlame.position.set(-1, 0, 0);
-afterburner.add(leftFlame);
+        const abMat = new THREE.MeshBasicMaterial({ color: 0x00ccff, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending });
+        const flameGeo = new THREE.ConeGeometry(0.6, 4, 16).translate(0, -2, 0);
 
-const rightFlame = new THREE.Mesh(flameGeo, abMat);
-rightFlame.position.set(1, 0, 0);
-afterburner.add(rightFlame);
+        const leftFlame = new THREE.Mesh(flameGeo, abMat);
+        leftFlame.position.set(-1, 0, 0);
+        afterburner.add(leftFlame);
 
-planeGrp.add(afterburner);
+        const rightFlame = new THREE.Mesh(flameGeo, abMat);
+        rightFlame.position.set(1, 0, 0);
+        afterburner.add(rightFlame);
+
+        planeGrp.add(afterburner);
         // PARTICLES
-        const maxPart = 800; 
+        const maxPart = 800;
         const pMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1.0 });
-        const parts = Array.from({length: maxPart}, () => { 
-            const m = new THREE.Mesh(new THREE.BoxGeometry(2,2,2), pMat.clone()); m.visible=false; scene.add(m); 
-            return {m, v: new THREE.Vector3(), l:0, type:'none'}; 
+        const parts = Array.from({ length: maxPart }, () => {
+            const m = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), pMat.clone()); m.visible = false; scene.add(m);
+            return { m, v: new THREE.Vector3(), l: 0, type: 'none' };
         });
 
         function triggerParticleEvent(pos, type, scale) {
             let activeCount = 0;
             const targetCount = type === 'smoke' ? 1 : (type === 'flak' ? 15 : (type === 'nuke' ? 250 : 40));
             parts.forEach(p => {
-                if(p.l <= 0 && activeCount < targetCount) {
+                if (p.l <= 0 && activeCount < targetCount) {
                     p.m.position.copy(pos);
-                    const t=Math.random()*Math.PI*2, ph=Math.acos(Math.random()*2-1), r=Math.random()*scale + (scale/2);
-                    
+                    const t = Math.random() * Math.PI * 2, ph = Math.acos(Math.random() * 2 - 1), r = Math.random() * scale + (scale / 2);
+
                     if (type === 'explosion' || type === 'flak') {
-                        p.v.set(r*Math.sin(ph)*Math.cos(t), Math.abs(r*Math.cos(ph))+scale/2, r*Math.sin(ph)*Math.sin(t));
-                        p.m.material.color.setHex(Math.random()>0.4 ? 0xff4400 : 0x222222);
+                        p.v.set(r * Math.sin(ph) * Math.cos(t), Math.abs(r * Math.cos(ph)) + scale / 2, r * Math.sin(ph) * Math.sin(t));
+                        p.m.material.color.setHex(Math.random() > 0.4 ? 0xff4400 : 0x222222);
                     } else if (type === 'nuke') {
-                        p.v.set(r*Math.sin(ph)*Math.cos(t)*1.5, Math.abs(r*Math.cos(ph))*2.5 + scale, r*Math.sin(ph)*Math.sin(t)*1.5);
-                        p.m.material.color.setHex(Math.random()>0.3 ? 0xffaa00 : 0xff2200);
+                        p.v.set(r * Math.sin(ph) * Math.cos(t) * 1.5, Math.abs(r * Math.cos(ph)) * 2.5 + scale, r * Math.sin(ph) * Math.sin(t) * 1.5);
+                        p.m.material.color.setHex(Math.random() > 0.3 ? 0xffaa00 : 0xff2200);
                     } else if (type === 'splash') {
-                        p.v.set(r*Math.sin(ph)*Math.cos(t)*0.5, Math.abs(r*Math.cos(ph))*1.5 + scale, r*Math.sin(ph)*Math.sin(t)*0.5);
-                        p.m.material.color.setHex(0xffffff); 
-                    } else if (type === 'smoke') { 
-                        p.v.set((Math.random()-0.5)*0.5, (Math.random()-0.5)*0.5, (Math.random()-0.5)*0.5);
+                        p.v.set(r * Math.sin(ph) * Math.cos(t) * 0.5, Math.abs(r * Math.cos(ph)) * 1.5 + scale, r * Math.sin(ph) * Math.sin(t) * 0.5);
+                        p.m.material.color.setHex(0xffffff);
+                    } else if (type === 'smoke') {
+                        p.v.set((Math.random() - 0.5) * 0.5, (Math.random() - 0.5) * 0.5, (Math.random() - 0.5) * 0.5);
                         p.m.material.color.setHex(0xaaaaaa);
                     }
-                    
+
                     p.l = 1.0; p.type = type; p.m.visible = true; activeCount++;
                 }
             });
@@ -821,34 +835,34 @@ planeGrp.add(afterburner);
         let bombs = []; let bombCount = 10;
         let bullets = []; let enemyBullets = [];
         let gunCooldown = 0; let enemyFireTimer = 0;
-        const flightDeckY = 41.5; 
-        
-        const xAxis = new THREE.Vector3(1,0,0); const yAxis = new THREE.Vector3(0,1,0); const zAxis = new THREE.Vector3(0,0,1);
-        
-        const keys = { keyw:0, keya:0, keys:0, keyd:0, arrowup:0, arrowdown:0, arrowleft:0, arrowright:0, space:0, keyf:0, keyz:0 }; 
-        window.onkeydown = e => { if(keys[e.code.toLowerCase()] !== undefined) keys[e.code.toLowerCase()] = 1; };
-        window.onkeyup = e => { 
-            if(keys[e.code.toLowerCase()] !== undefined) keys[e.code.toLowerCase()] = 0; 
-            if(e.code === 'Space' && gameState === 'playing' && bombCount > 0) fireMissile();
+        const flightDeckY = 41.5;
+
+        const xAxis = new THREE.Vector3(1, 0, 0); const yAxis = new THREE.Vector3(0, 1, 0); const zAxis = new THREE.Vector3(0, 0, 1);
+
+        const keys = { keyw: 0, keya: 0, keys: 0, keyd: 0, arrowup: 0, arrowdown: 0, arrowleft: 0, arrowright: 0, space: 0, keyf: 0, keyz: 0 };
+        window.onkeydown = e => { if (keys[e.code.toLowerCase()] !== undefined) keys[e.code.toLowerCase()] = 1; };
+        window.onkeyup = e => {
+            if (keys[e.code.toLowerCase()] !== undefined) keys[e.code.toLowerCase()] = 0;
+            if (e.code === 'Space' && gameState === 'playing' && bombCount > 0) fireMissile();
         };
 
         // MOUSE RAYCASTING FOR TARGET LOCK
         const raycaster = new THREE.Raycaster();
         const mouse = new THREE.Vector2();
-        
+
         window.addEventListener('mousedown', (event) => {
-            if(gameState !== 'playing') return;
+            if (gameState !== 'playing') return;
             initAudio(); // Initialize audio context on click
-            
+
             // Normalize mouse coordinates (-1 to +1)
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-            
+
             raycaster.setFromCamera(mouse, camera);
-            
+
             // Check if user clicked the enemy ship
             const intersects = raycaster.intersectObject(enemyShip, true);
-            if(intersects.length > 0 && enemyAlive) {
+            if (intersects.length > 0 && enemyAlive) {
                 isTargetLocked = true;
                 sysAudio('lock');
             } else {
@@ -861,19 +875,19 @@ planeGrp.add(afterburner);
             sysAudio('launch');
 
             const bombGrp = new THREE.Group();
-            const bBody = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.0, 8).rotateX(Math.PI/2), new THREE.MeshStandardMaterial({color: 0xdddddd}));
-            const bTail = new THREE.Mesh(new THREE.BoxGeometry(3, 3, 1.5), new THREE.MeshStandardMaterial({color: 0xff3300})); 
+            const bBody = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.0, 8).rotateX(Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xdddddd }));
+            const bTail = new THREE.Mesh(new THREE.BoxGeometry(3, 3, 1.5), new THREE.MeshStandardMaterial({ color: 0xff3300 }));
             bTail.position.set(0, 0, -4); bombGrp.add(bBody, bTail);
-            
+
             bombGrp.position.copy(planeGrp.position); bombGrp.position.y -= 2.5; bombGrp.rotation.copy(planeGrp.rotation);
             scene.add(bombGrp);
 
-            const forward = new THREE.Vector3(0,0,-1).applyQuaternion(planeGrp.quaternion);
-            const missileSpeed = Math.max(speed + 5.0, 15.0); 
+            const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(planeGrp.quaternion);
+            const missileSpeed = Math.max(speed + 5.0, 15.0);
             const bombVel = forward.multiplyScalar(missileSpeed);
-            
+
             // Check if UI says we are locked
-            bombs.push({mesh: bombGrp, vel: bombVel, isHoming: isTargetLocked});
+            bombs.push({ mesh: bombGrp, vel: bombVel, isHoming: isTargetLocked });
         }
 
         function flashDamage() {
@@ -884,18 +898,18 @@ planeGrp.add(afterburner);
         function damageEnemy(amount, isKamikaze = false) {
             if (!enemyAlive) return;
             enemyHp -= amount;
-            document.getElementById('enemyHpBar').style.width = Math.max(0, (enemyHp/enemyMaxHp)*100) + '%';
-            
-            if(enemyHp <= 0) {
+            document.getElementById('enemyHpBar').style.width = Math.max(0, (enemyHp / enemyMaxHp) * 100) + '%';
+
+            if (enemyHp <= 0) {
                 enemyAlive = false;
                 isTargetLocked = false;
                 document.getElementById('enemyBlip').style.display = 'none';
                 document.getElementById('lockOnUI').style.display = 'none';
-                
+
                 if (!isKamikaze) {
                     screenShake = 40.0; triggerParticleEvent(enemyShip.position, 'explosion', 80);
                 }
-                
+
                 if (gameState === "playing" && !isKamikaze) {
                     setTimeout(() => {
                         gameState = "levelTransition";
@@ -915,9 +929,9 @@ planeGrp.add(afterburner);
         }
 
         function resetToCarrier() {
-            planeGrp.position.set(0, flightDeckY, 500); 
-            planeGrp.rotation.set(0,0,0); planeGrp.quaternion.identity();
-            throttle = 0; speed = 0; isGrounded = true; planeGrp.visible = true; 
+            planeGrp.position.set(0, flightDeckY, 500);
+            planeGrp.rotation.set(0, 0, 0); planeGrp.quaternion.identity();
+            throttle = 0; speed = 0; isGrounded = true; planeGrp.visible = true;
             bombCount = 10; document.getElementById('bombText').innerText = `10 / 10`;
             bombs.forEach(b => scene.remove(b.mesh)); bombs = [];
             bullets.forEach(b => scene.remove(b.mesh)); bullets = [];
@@ -928,26 +942,26 @@ planeGrp.add(afterburner);
         function nextLevel() {
             level++;
             document.getElementById('levelScreen').style.display = 'none';
-            playerHp = Math.min(playerMaxHp, playerHp + 30); 
-            document.getElementById('hpBar').style.width = (playerHp/playerMaxHp)*100 + '%';
+            playerHp = Math.min(playerMaxHp, playerHp + 30);
+            document.getElementById('hpBar').style.width = (playerHp / playerMaxHp) * 100 + '%';
             resetToCarrier(); respawnEnemy(); gameState = "playing";
         }
 
         function animate() {
             requestAnimationFrame(animate);
             let time = Date.now() * 0.001;
-            
-            if(oceanMat.userData.shader) oceanMat.userData.shader.uniforms.time.value = time;
+
+            if (oceanMat.userData.shader) oceanMat.userData.shader.uniforms.time.value = time;
 
             if (gameState === "playing") {
                 if (keys.keyw) throttle = Math.min(1.0, throttle + 0.005);
                 if (keys.keys) throttle = Math.max(0.0, throttle - 0.01);
-                
+
                 let currentMaxSpeed = throttle > 0.8 ? currentBaseSpeed * 1.5 : currentBaseSpeed;
                 speed += ((throttle * currentMaxSpeed) - speed) * 0.015;
-                
+
                 afterburner.visible = throttle > 0.8 && !isGrounded;
-                if(afterburner.visible) afterburner.scale.set(1, 1 + Math.random()*0.5, 1);
+                if (afterburner.visible) afterburner.scale.set(1, 1 + Math.random() * 0.5, 1);
 
                 // SIMPLIFIED STEERING (NO ROLL)
                 if (speed > 0.1) {
@@ -962,25 +976,25 @@ planeGrp.add(afterburner);
 
                 planeGrp.translateZ(-speed);
                 let vertVel = (speed * 0.015) - 0.04;
-                let waveHeight = Math.sin(planeGrp.position.x * 0.01 + time)*6 + Math.cos(planeGrp.position.z * 0.015 + time*1.2)*6;
+                let waveHeight = Math.sin(planeGrp.position.x * 0.01 + time) * 6 + Math.cos(planeGrp.position.z * 0.015 + time * 1.2) * 6;
                 let groundY = waveHeight; let onDeck = false;
 
-                if (Math.abs(planeGrp.position.x - carrierGrp.position.x) < 40 && 
-                    planeGrp.position.z > carrierGrp.position.z - 700 && 
+                if (Math.abs(planeGrp.position.x - carrierGrp.position.x) < 40 &&
+                    planeGrp.position.z > carrierGrp.position.z - 700 &&
                     planeGrp.position.z < carrierGrp.position.z + 700 && planeGrp.position.y > 35) {
                     groundY = flightDeckY; onDeck = true;
                 }
 
                 if (planeGrp.position.y <= groundY) {
-                    planeGrp.position.y = groundY; isGrounded = true; 
+                    planeGrp.position.y = groundY; isGrounded = true;
                     document.getElementById('gearText').innerText = "DOWN";
                     const eul = new THREE.Euler().setFromQuaternion(planeGrp.quaternion, 'YXZ');
-                    eul.x *= 0.8; planeGrp.quaternion.setFromEuler(eul); 
+                    eul.x *= 0.8; planeGrp.quaternion.setFromEuler(eul);
                     if (!onDeck) triggerCrash("DITCHED IN OCEAN");
                     else if (onDeck && (vertVel < -0.4 || speed > 2.0 && planeGrp.position.z < -650)) triggerCrash("DECK CRASH");
                 } else {
                     isGrounded = false; document.getElementById('gearText').innerText = "UP";
-                    planeGrp.position.y += vertVel; 
+                    planeGrp.position.y += vertVel;
                 }
 
                 enemyShip.updateMatrixWorld();
@@ -989,7 +1003,7 @@ planeGrp.add(afterburner);
                 enemyShip.worldToLocal(planeLocalPos);
                 if (enemyAlive && Math.abs(planeLocalPos.x) < 60 && Math.abs(planeLocalPos.z) < 280 && planeLocalPos.y < 80 && planeLocalPos.y > -20) {
                     if (bombCount === 0) {
-                        damageEnemy(999, true); 
+                        damageEnemy(999, true);
                         triggerCrash("HONORABLE SACRIFICE", true);
                     } else {
                         triggerCrash("CRASHED INTO TARGET");
@@ -998,23 +1012,23 @@ planeGrp.add(afterburner);
 
                 for (let i = bombs.length - 1; i >= 0; i--) {
                     let b = bombs[i];
-                    
+
                     // SLIGHT AIM ASSIST LOGIC
                     if (b.isHoming && enemyAlive) {
                         let targetPos = enemyShip.position.clone();
-                        targetPos.y += 15; 
+                        targetPos.y += 15;
                         let dir = targetPos.sub(b.mesh.position).normalize();
                         let currentSpeed = b.vel.length();
                         // Reduced from 0.04 to 0.008 for "slight nudge" aim assist
-                        b.vel.lerp(dir.multiplyScalar(currentSpeed), 0.008); 
-                        b.mesh.lookAt(b.mesh.position.clone().add(b.vel)); 
+                        b.vel.lerp(dir.multiplyScalar(currentSpeed), 0.008);
+                        b.mesh.lookAt(b.mesh.position.clone().add(b.vel));
                     } else {
                         b.vel.y -= 0.02; // Gravity for dumb bombs
                         b.mesh.rotateOnAxis(xAxis, -0.01);
                     }
 
-                    b.mesh.position.add(b.vel); 
-                    if(Math.random() > 0.3) triggerParticleEvent(b.mesh.position, 'smoke', 4);
+                    b.mesh.position.add(b.vel);
+                    if (Math.random() > 0.3) triggerParticleEvent(b.mesh.position, 'smoke', 4);
 
                     if (b.mesh.position.y <= 0) {
                         sysAudio('splash'); triggerParticleEvent(b.mesh.position, 'splash', 25);
@@ -1028,19 +1042,19 @@ planeGrp.add(afterburner);
                         sysAudio('explode'); screenShake = 20.0;
                         triggerParticleEvent(b.mesh.position, 'explosion', 35);
                         scene.remove(b.mesh); bombs.splice(i, 1);
-                        damageEnemy(3.0); 
+                        damageEnemy(3.0);
                     }
                 }
 
                 // Enemy AI & UI Locking
                 if (enemyAlive) {
                     const shipPos2D = enemyShip.position.clone();
-                    shipPos2D.y += 30; 
-                    shipPos2D.project(camera); 
+                    shipPos2D.y += 30;
+                    shipPos2D.project(camera);
 
                     const lockUI = document.getElementById('lockOnUI');
                     // Only show UI if target is actively locked
-                    if(isTargetLocked && shipPos2D.z < 1) { 
+                    if (isTargetLocked && shipPos2D.z < 1) {
                         const x = (shipPos2D.x * .5 + .5) * window.innerWidth;
                         const y = (-(shipPos2D.y * .5) + .5) * window.innerHeight;
                         lockUI.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
@@ -1052,49 +1066,49 @@ planeGrp.add(afterburner);
                     let distToPlayer = planeGrp.position.distanceTo(enemyShip.position);
                     turrets.forEach(t => {
                         let target = planeGrp.position.clone();
-                        target.add(new THREE.Vector3(0,0,-speed*20).applyQuaternion(planeGrp.quaternion));
+                        target.add(new THREE.Vector3(0, 0, -speed * 20).applyQuaternion(planeGrp.quaternion));
                         t.lookAt(target);
                     });
 
-                    if(distToPlayer < 12000 && planeGrp.position.y > 50) {
+                    if (distToPlayer < 12000 && planeGrp.position.y > 50) {
                         enemyFireTimer++;
-                        let fireRate = Math.max(10, 50 - (level * 5)); 
-                        if(enemyFireTimer > fireRate) {
+                        let fireRate = Math.max(10, 50 - (level * 5));
+                        if (enemyFireTimer > fireRate) {
                             enemyFireTimer = 0; sysAudio('flak');
-                            let rT = turrets[Math.floor(Math.random()*turrets.length)];
+                            let rT = turrets[Math.floor(Math.random() * turrets.length)];
                             let spawnPos = new THREE.Vector3().setFromMatrixPosition(rT.matrixWorld);
-                            const flakMesh = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 15).rotateX(Math.PI/2), new THREE.MeshBasicMaterial({color: 0xff3300}));
+                            const flakMesh = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 15).rotateX(Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xff3300 }));
                             flakMesh.position.copy(spawnPos);
                             let aim = planeGrp.position.clone().sub(spawnPos).normalize();
-                            aim.x += (Math.random()-0.5)*0.05; aim.y += (Math.random()-0.5)*0.05; aim.z += (Math.random()-0.5)*0.05;
-                            flakMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1), aim);
+                            aim.x += (Math.random() - 0.5) * 0.05; aim.y += (Math.random() - 0.5) * 0.05; aim.z += (Math.random() - 0.5) * 0.05;
+                            flakMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), aim);
                             scene.add(flakMesh);
-                            enemyBullets.push({mesh: flakMesh, vel: aim.multiplyScalar(20), life: 300});
+                            enemyBullets.push({ mesh: flakMesh, vel: aim.multiplyScalar(20), life: 300 });
                         }
                     }
-                    
+
                     let dx = enemyShip.position.x - planeGrp.position.x;
                     let dz = enemyShip.position.z - planeGrp.position.z;
-                    let scale = 75 / 30000; 
+                    let scale = 75 / 30000;
                     let rx = dx * scale; let rz = dz * scale;
-                    let distUI = Math.sqrt(rx*rx + rz*rz);
-                    if (distUI > 70) { rx = (rx/distUI)*70; rz = (rz/distUI)*70; }
+                    let distUI = Math.sqrt(rx * rx + rz * rz);
+                    if (distUI > 70) { rx = (rx / distUI) * 70; rz = (rz / distUI) * 70; }
                     document.getElementById('enemyBlip').style.transform = `translate(${rx}px, ${rz}px)`;
                 }
 
-                if(!enemyAlive && enemyShip.position.y > -100) {
+                if (!enemyAlive && enemyShip.position.y > -100) {
                     enemyShip.position.y -= 0.15; enemyShip.rotation.x -= 0.0005; enemyShip.rotation.z += 0.001;
                 }
 
                 for (let i = enemyBullets.length - 1; i >= 0; i--) {
                     let b = enemyBullets[i]; b.mesh.position.add(b.vel); b.life--;
-                    if(b.life <= 0 || b.mesh.position.y < 0) { scene.remove(b.mesh); enemyBullets.splice(i, 1); continue; }
-                    if(b.mesh.position.distanceTo(planeGrp.position) < 25) {
+                    if (b.life <= 0 || b.mesh.position.y < 0) { scene.remove(b.mesh); enemyBullets.splice(i, 1); continue; }
+                    if (b.mesh.position.distanceTo(planeGrp.position) < 25) {
                         sysAudio('pew'); flashDamage(); triggerParticleEvent(planeGrp.position, 'flak', 5);
                         scene.remove(b.mesh); enemyBullets.splice(i, 1);
                         playerHp -= 10;
-                        document.getElementById('hpBar').style.width = Math.max(0, (playerHp/playerMaxHp)*100) + '%';
-                        if(playerHp <= 0) triggerCrash("SHOT DOWN");
+                        document.getElementById('hpBar').style.width = Math.max(0, (playerHp / playerMaxHp) * 100) + '%';
+                        if (playerHp <= 0) triggerCrash("SHOT DOWN");
                     }
                 }
 
@@ -1104,7 +1118,7 @@ planeGrp.add(afterburner);
                 document.getElementById('altText').innerText = Math.max(0, Math.floor((planeGrp.position.y - waveHeight) * 10)).toString().padStart(4, '0');
                 const isStalling = (!isGrounded && speed < 1.5 && planeGrp.position.y > 50);
                 document.getElementById('warningText').style.opacity = isStalling ? 1 : 0;
-                
+
                 // ZOOM CAMERA LOGIC (Z Key)
                 let targetFov = keys.keyz ? 25 : 60;
                 camera.fov += (targetFov - camera.fov) * 0.1;
@@ -1112,28 +1126,28 @@ planeGrp.add(afterburner);
             }
 
             if (gameState === "playing" || gameState === "levelTransition") {
-                const offset = new THREE.Vector3(0, 25, 65).applyMatrix4(planeGrp.matrixWorld); 
+                const offset = new THREE.Vector3(0, 25, 65).applyMatrix4(planeGrp.matrixWorld);
                 camera.position.lerp(offset, 0.1);
                 const look = planeGrp.position.clone(); look.y += 10; camera.lookAt(look);
             } else if (gameState === "menu") {
-                camera.position.set(100, 80, 250); camera.lookAt(0, 40, 0); 
+                camera.position.set(100, 80, 250); camera.lookAt(0, 40, 0);
             }
 
             if (screenShake > 0) {
-                camera.position.x += (Math.random() - 0.5) * screenShake; 
+                camera.position.x += (Math.random() - 0.5) * screenShake;
                 camera.position.y += (Math.random() - 0.5) * screenShake;
                 screenShake = Math.max(0, screenShake - 0.5);
             }
 
             parts.forEach(p => {
-                if(p.l > 0) { 
-                    p.l -= (p.type === 'splash' ? 0.02 : (p.type === 'smoke' ? 0.04 : 0.015)); 
-                    p.m.position.add(p.v); 
-                    if (p.type !== 'smoke') p.v.y -= 0.1; 
+                if (p.l > 0) {
+                    p.l -= (p.type === 'splash' ? 0.02 : (p.type === 'smoke' ? 0.04 : 0.015));
+                    p.m.position.add(p.v);
+                    if (p.type !== 'smoke') p.v.y -= 0.1;
                     let scaleTarget = p.type === 'splash' ? 2 : (p.type === 'smoke' ? 3 : (p.type === 'nuke' ? 8 : 4));
-                    p.m.scale.setScalar(p.l * scaleTarget); 
-                    if(p.m.position.y < 0 && p.type !== 'smoke') p.l = 0; 
-                    if(p.l<=0) p.m.visible=false; 
+                    p.m.scale.setScalar(p.l * scaleTarget);
+                    if (p.m.position.y < 0 && p.type !== 'smoke') p.l = 0;
+                    if (p.l <= 0) p.m.visible = false;
                 }
             });
 
@@ -1141,18 +1155,18 @@ planeGrp.add(afterburner);
         }
 
         function triggerCrash(reason, isKamikaze = false) {
-            if(gameState === "crashed") return;
+            if (gameState === "crashed") return;
             gameState = "crashed"; planeGrp.visible = false; document.getElementById('warningText').style.opacity = 0;
             document.getElementById('lockOnUI').style.display = 'none';
-            sysAudio('explode'); 
-            
+            sysAudio('explode');
+
             if (isKamikaze) {
                 screenShake = 120.0;
                 triggerParticleEvent(enemyShip.position, 'nuke', 200);
                 setTimeout(() => triggerParticleEvent(enemyShip.position, 'nuke', 250), 300);
                 setTimeout(() => triggerParticleEvent(enemyShip.position, 'explosion', 150), 600);
-                
-                setTimeout(() => { 
+
+                setTimeout(() => {
                     document.getElementById('levelScreen').style.display = 'flex';
                     document.getElementById('levelMessage').innerText = "KAMIKAZE SUCCESS";
                     document.getElementById('levelSub').innerText = "TARGET DESTROYED. PREPARE NEXT JET.";
@@ -1163,8 +1177,8 @@ planeGrp.add(afterburner);
             } else {
                 screenShake = 30.0;
                 triggerParticleEvent(planeGrp.position, 'explosion', 40);
-                setTimeout(() => { 
-                    document.getElementById('endScreen').style.display = 'flex'; 
+                setTimeout(() => {
+                    document.getElementById('endScreen').style.display = 'flex';
                     document.getElementById('endSub').innerText = reason;
                 }, 2000);
             }
@@ -1174,4 +1188,5 @@ planeGrp.add(afterburner);
         animate();
     </script>
 </body>
-</html> 
+
+</html>
