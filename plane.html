@@ -1115,7 +1115,6 @@
 
                 if (planeGrp.position.y <= groundY) {
                     planeGrp.position.y = groundY; isGrounded = true;
-
                     document.getElementById('gearText').innerText = "DOWN";
                     const eul = new THREE.Euler().setFromQuaternion(planeGrp.quaternion, 'YXZ');
                     eul.x *= 0.8; planeGrp.quaternion.setFromEuler(eul);
