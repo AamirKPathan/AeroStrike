@@ -1257,21 +1257,21 @@
                     }
                 }
                 function dropFlares() {
-    for (let i = 0; i < 6; i++) {
-        const flare = new THREE.Mesh(
-            new THREE.SphereGeometry(1.2, 8, 8),
-            new THREE.MeshBasicMaterial({ color: 0xffaa55 })
-        );
+                    for (let i = 0; i < 6; i++) {
+                        const flare = new THREE.Mesh(
+                            new THREE.SphereGeometry(1.2, 8, 8),
+                            new THREE.MeshBasicMaterial({ color: 0xffaa55 })
+                        );
 
-        flare.position.copy(planeGrp.position);
-        flare.position.x += (Math.random() - 0.5) * 10;
-        flare.position.y += (Math.random() - 0.5) * 5;
-        flare.position.z += (Math.random() - 0.5) * 10;
+                        flare.position.copy(planeGrp.position);
+                        flare.position.x += (Math.random() - 0.5) * 10;
+                        flare.position.y += (Math.random() - 0.5) * 5;
+                        flare.position.z += (Math.random() - 0.5) * 10;
 
-        flares.push({ mesh: flare, life: 80 });
-        scene.add(flare);
-    }
-}
+                        flares.push({ mesh: flare, life: 80 });
+                        scene.add(flare);
+                    }
+                }
 
                 document.getElementById('throttleBar').style.width = (throttle * 100) + '%';
                 document.getElementById('throttleBar').style.background = throttle > 0.8 ? '#00ccff' : '#00ff88';
