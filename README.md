@@ -22,7 +22,8 @@ https://aamir-pa2009.itch.io/aerostrike
 | Zoom             | Z              |
 | Camera Toggle    | C              |
 | Lock Target      | Click Ship     |
-| Pause             
+| Pause            | P              
+
 
 ---
 
