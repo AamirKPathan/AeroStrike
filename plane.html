@@ -847,7 +847,15 @@
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('gameUI').style.display = 'block';
             level = 1; playerHp = playerMaxHp; document.getElementById('hpBar').style.width = '100%';
-            resetToCarrier(); respawnEnemy(); gameState = "playing";
+            resetToCarrier(); 
+            
+            // Spawn initial jets for Level 1
+            enemyJets.forEach(jet => scene.remove(jet));
+            enemyJets = [];
+            enemyJets.push(createEnemyJet());
+            
+            respawnEnemy(); 
+            gameState = "playing";
         }
 
         function resetToCarrier() {
@@ -868,6 +876,11 @@
             playerHp = Math.min(playerMaxHp, playerHp + 30);
             document.getElementById('hpBar').style.width = (playerHp / playerMaxHp) * 100 + '%';
             resetToCarrier(); respawnEnemy(); gameState = "playing";
+            // Remove old jet blips from DOM
+            enemyJets.forEach((_, index) => {
+                const oldBlip = document.getElementById('jetBlip' + index);
+                if (oldBlip) oldBlip.remove();
+            });
             enemyJets.forEach(jet => scene.remove(jet));
             enemyJets = [];
             let jetCount = Math.min(1 + Math.floor(level / 2), 6);
@@ -1027,6 +1040,33 @@
                     let scale = 75 / 30000; let rx = dx * scale; let rz = dz * scale;
                     let distUI = Math.sqrt(rx * rx + rz * rz); if (distUI > 70) { rx = (rx / distUI) * 70; rz = (rz / distUI) * 70; }
                     document.getElementById('enemyBlip').style.transform = `translate(${rx}px, ${rz}px)`;
+
+                    // UPDATE JET RADAR BLIPS
+                    enemyJets.forEach((jet, index) => {
+                        let blip = document.getElementById('jetBlip' + index);
+                        if (!blip) {
+                            blip = document.createElement('div');
+                            blip.id = 'jetBlip' + index;
+                            blip.style.position = 'absolute';
+                            blip.style.width = '6px';
+                            blip.style.height = '6px';
+                            blip.style.background = '#00ff88';
+                            blip.style.borderRadius = '50%';
+                            blip.style.boxShadow = '0 0 8px #00ff88';
+                            document.getElementById('radarUI').appendChild(blip);
+                        }
+                        if (jet.alive) {
+                            blip.style.display = 'block';
+                            let jdx = jet.position.x - planeGrp.position.x;
+                            let jdz = jet.position.z - planeGrp.position.z;
+                            let jrx = jdx * scale; let jrz = jdz * scale;
+                            let jdist = Math.sqrt(jrx * jrx + jrz * jrz);
+                            if (jdist > 70) { jrx = (jrx / jdist) * 70; jrz = (jrz / jdist) * 70; }
+                            blip.style.transform = `translate(${jrx}px, ${jrz}px)`;
+                        } else {
+                            blip.style.display = 'none';
+                        }
+                    });
                 }
 
                 if (!enemyAlive && enemyShip.position.y > -100) {
