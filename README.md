@@ -72,5 +72,3 @@ Your primary objective is to locate and destroy the enemy cruiser.
 
 ## 🎥 Gameplay
 [Watch the AeroStrike Gameplay Video](https://youtu.be/P-ykU11OTvg)
-git add .
-git commit -m "Updated AeroStrike build"git push origin main
