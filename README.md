@@ -170,4 +170,3 @@ Built for HTML5 Canvas and deployed on Itch.io for instant play.
 
 ## 🎥 Gameplay Video
 [![Watch the video](media\Screenshot 2026-06-14 130917.png)](https://youtu.be/P-ykU11OTvg)
-
