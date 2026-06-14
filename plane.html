@@ -1249,6 +1249,15 @@
                         enemyMissiles.splice(i, 1);
                         continue;
                     }
+                    // Check flares
+                    for (let f of flares) {
+                        if (m.mesh.position.distanceTo(f.mesh.position) < 30) {
+                            triggerParticleEvent(f.mesh.position, 'explosion', 20);
+                            scene.remove(m.mesh);
+                            enemyMissiles.splice(i, 1);
+                            break;
+                        }
+                    }
 
                     if (m.mesh.position.distanceTo(planeGrp.position) < 20) {
                         flashDamage();
