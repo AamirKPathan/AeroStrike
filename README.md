@@ -12,6 +12,7 @@ Built with **JavaScript** and the **Three.js WebGL library**, AeroStrike deliver
 ---
 
 ## 🎮 Controls
+The game features an integrated **Bottom Control Bar** for quick reference during flight.
 
 | Action             | Key             |
 |--------------------|-----------------|
@@ -21,28 +22,26 @@ Built with **JavaScript** and the **Three.js WebGL library**, AeroStrike deliver
 | **Fire Missile**   | Space           |
 | **Deploy Flares**  | F               |
 | **Zoom View**      | Z               |
-| **Toggle Camera**  | C               |
 | **Lock Target**    | Click Target    |
 | **Pause Game**     | P               |
-
-![Controls Images](/media/)
 
 ---
 
 ## 📊 HUD & Systems Overview
 
-The tactical Head-Up Display (HUD) provides critical flight data:
+The tactical Head-Up Display (HUD) has been **minimalized** to provide a clear field of view while maintaining critical flight data:
 
-*   **Flight Data**: Real-time Altitude (ft) and Airspeed (kts) indicators.
-*   **Integrity**: A visual health bar monitoring aircraft structural damage.
+*   **Flight Data**: Real-time Altitude (ft) and Airspeed (kts) indicators located in the top-left.
+*   **Integrity**: A streamlined health bar monitoring aircraft structural damage.
 *   **Armament**: Missile count and target locking status.
 *   **Threat Detection**: Visual "MISSILE ALERT" HUD indicator and synchronized audio warning tones.
-*   **Radar**: A 3D-to-2D mapped radar system showing the enemy cruiser (Red) and hostile jets (Green).
+*   **Radar**: A 3D-to-2D mapped circular radar system showing targets.
 *   **Landing Gear**: Automated gear system that deploys during low-altitude carrier approaches.
 
-![Hud Radar](media\Screenshot 2026-06-14 132613.png)
-![Altimeter and ASI](media\Screenshot 2026-06-14 132632.png)
-![Ammo, Gear, And Health](media\Screenshot 2026-06-14 132644.png)
+![Hud Radar](media/Screenshot%202026-06-14%20132613.png)
+![Altimeter and ASI](media/Screenshot%202026-06-14%20132632.png)
+![Ammo, Gear, And Health](media/Screenshot%202026-06-14%20132644.png)
+
 ---
 
 ## 🧭 Mission Objective
@@ -53,7 +52,9 @@ Your primary objective is to locate and destroy the enemy cruiser.
 2.  **Dogfight**: Defend yourself against intercepting enemy jets.
 3.  **Countermeasure**: Use flares to decoy incoming homing missiles.
 4.  **Rearm**: If you run low on ammo or health, return to the carrier deck for a full repair and rearm.
-![Mission Objectives](media\Screenshot 2026-06-14 130917.png)
+
+![Mission Objectives](media/Screenshot%202026-06-14%20130917.png)
+
 ---
 
 ## 🛠️ Technical Implementation
