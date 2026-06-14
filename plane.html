@@ -1138,25 +1138,25 @@
                         lockUI.style.display = 'none';
                     }
                     // === ENEMY JET AI ===
-enemyJets.forEach(jet => {
-    if (!jet.alive) return;
+                    enemyJets.forEach(jet => {
+                        if (!jet.alive) return;
 
-    const toPlayer = planeGrp.position.clone().sub(jet.position);
-    const dist = toPlayer.length();
+                        const toPlayer = planeGrp.position.clone().sub(jet.position);
+                        const dist = toPlayer.length();
 
-    const desiredDir = toPlayer.normalize();
-    const currentDir = new THREE.Vector3(0, 0, -1).applyQuaternion(jet.quaternion);
+                        const desiredDir = toPlayer.normalize();
+                        const currentDir = new THREE.Vector3(0, 0, -1).applyQuaternion(jet.quaternion);
 
-    const turnRate = 0.02;
-    const newDir = currentDir.lerp(desiredDir, turnRate).normalize();
-    jet.lookAt(jet.position.clone().add(newDir));
+                        const turnRate = 0.02;
+                        const newDir = currentDir.lerp(desiredDir, turnRate).normalize();
+                        jet.lookAt(jet.position.clone().add(newDir));
 
-    jet.translateZ(-2.5);
+                        jet.translateZ(-2.5);
 
-    if (dist < 1500 && Math.random() < 0.01) {
-        fireEnemyMissile(jet);
-    }
-});
+                        if (dist < 1500 && Math.random() < 0.01) {
+                            fireEnemyMissile(jet);
+                        }
+                    });
 
 
                     let distToPlayer = planeGrp.position.distanceTo(enemyShip.position);
