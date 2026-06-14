@@ -912,6 +912,10 @@
                 isPaused = !isPaused;
                 document.getElementById('pauseScreen').style.display = isPaused ? 'flex' : 'none';
             }
+            if (e.code === "KeyF" && gameState === "playing") {
+                dropFlares();
+            }
+
 
         };
 
