@@ -1315,16 +1315,16 @@
                     if (p.l <= 0) p.m.visible = false;
                 }
                 // === FLARES ===
-for (let i = flares.length - 1; i >= 0; i--) {
-    let f = flares[i];
-    f.life--;
-    f.mesh.material.opacity = f.life / 80;
+                for (let i = flares.length - 1; i >= 0; i--) {
+                    let f = flares[i];
+                    f.life--;
+                    f.mesh.material.opacity = f.life / 80;
 
-    if (f.life <= 0) {
-        scene.remove(f.mesh);
-        flares.splice(i, 1);
-    }
-}
+                    if (f.life <= 0) {
+                        scene.remove(f.mesh);
+                        flares.splice(i, 1);
+                    }
+                }
 
             });
 
