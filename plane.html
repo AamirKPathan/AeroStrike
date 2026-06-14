@@ -392,12 +392,9 @@
             z-index: 5;
         }
     </style>
-
-
 </head>
 
 <body>
-
     <div id="startScreen" class="overlay">
         <div class="menu-panel">
             <h1>AERO<span class="title-accent">STRIKE</span></h1>
@@ -414,12 +411,10 @@
         <div id="lockOnUI">
             <div class="lock-text">LOCKED</div>
         </div>
-        <div id="controlsHelp">A/D: STEER &bull; UP/DOWN: PITCH &bull; <span class="highlight-blue">CLICK SHIP:
-                LOCK</span> &bull; <span class="highlight">Z: ZOOM</span> &bull; SPACE: FIRE</div>
+        <div id="controlsHelp">A/D: STEER &bull; UP/DOWN: PITCH &bull; <span class="highlight-blue">CLICK SHIP: LOCK</span> &bull; <span class="highlight">Z: ZOOM</span> &bull; SPACE: FIRE</div>
 
         <div id="objectiveHud" class="hud-panel">
-            <div class="hud-label" id="modeTitle" style="color:#ff3333;">MISSION: LEVEL <span id="lvlText">1</span>
-            </div>
+            <div class="hud-label" id="modeTitle" style="color:#ff3333;">MISSION: LEVEL <span id="lvlText">1</span></div>
             <div class="hud-value" id="modeObjective" style="font-size: 22px;">SINK THE CRUISER</div>
             <div class="bar-wrapper" style="height: 6px; border:none;">
                 <div class="enemy-health-bar" id="enemyHpBar"></div>
@@ -438,8 +433,8 @@
             <div id="endSub">MISSION FAILED</div>
             <button class="btn-mission" onclick="location.reload()" style="margin-top: 20px;">RETRY MISSION</button>
         </div>
-        <div id="pauseScreen" class="overlay"
-            style="display:none; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px);">
+
+        <div id="pauseScreen" class="overlay" style="display:none; background:rgba(0,0,0,0.6); backdrop-filter:blur(6px);">
             <h1 style="font-size:48px; letter-spacing:0.2em;">PAUSED</h1>
             <p class="subtitle">Press P to Resume</p>
         </div>
@@ -465,8 +460,7 @@
                 <div class="health-bar" id="hpBar"></div>
             </div>
             <div class="hud-label">MISSILES</div>
-            <div class="hud-value" id="bombText" style="color: #ffaa00; font-size:26px; margin-bottom:10px;">10 / 10
-            </div>
+            <div class="hud-value" id="bombText" style="color: #ffaa00; font-size:26px; margin-bottom:10px;">10 / 10</div>
             <div class="hud-label">GEAR</div>
             <div class="hud-value" id="gearText" style="font-size:20px;">DOWN</div>
         </div>
@@ -624,252 +618,103 @@
             enemyShip.rotation.set(0, (Math.random() - 0.5) * 3, 0);
             enemyShip.updateMatrixWorld();
             document.getElementById('enemyBlip').style.display = 'block';
-            // === RADAR BLIPS FOR ENEMY JETS ===
-            enemyJets.forEach((jet, index) => {
-                let blip = document.getElementById('jetBlip' + index);
-
-                if (!blip) {
-                    blip = document.createElement('div');
-                    blip.id = 'jetBlip' + index;
-                    blip.style.position = 'absolute';
-                    blip.style.width = '6px';
-                    blip.style.height = '6px';
-                    blip.style.background = '#00ff88';
-                    blip.style.borderRadius = '50%';
-                    blip.style.boxShadow = '0 0 8px #00ff88';
-                    document.getElementById('radarUI').appendChild(blip);
-                }
-
-                const dx = jet.position.x - planeGrp.position.x;
-                const dz = jet.position.z - planeGrp.position.z;
-
-                const scale = 75 / 30000;
-                let rx = dx * scale;
-                let rz = dz * scale;
-
-                const distUI = Math.sqrt(rx*rx + rz*rz);
-                if (distUI > 70) {
-                    rx = (rx/distUI)*70;
-                    rz = (rz/distUI)*70;
-                }
-
-                blip.style.transform = `translate(${rx}px, ${rz}px)`;
-            });
-
             document.getElementById('enemyHpBar').style.width = '100%';
             document.getElementById('lockOnUI').style.display = 'none';
         }
+
+        // MATERIALS for planes
+        const matChassis = new THREE.MeshStandardMaterial({ color: 0x6b7782, metalness: 0.5, roughness: 0.6 });
+        const matDark = new THREE.MeshStandardMaterial({ color: 0x2a353f, metalness: 0.7, roughness: 0.4 });
+        const matGlass = new THREE.MeshPhysicalMaterial({ color: 0x050a10, metalness: 0.9, roughness: 0.1, transparent: true, opacity: 0.8 });
+
         function createEnemyJet() {
             const jet = new THREE.Group();
-
-            const body = new THREE.Mesh(
-                new THREE.CylinderGeometry(1.2, 1.2, 18, 12).rotateX(Math.PI / 2),
-                matDark
-            );
+            const body = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, 18, 12).rotateX(Math.PI / 2), matDark);
             jet.add(body);
-
-            const nose = new THREE.Mesh(
-                new THREE.ConeGeometry(1.2, 4, 12).rotateX(Math.PI / 2),
-                matDark
-            );
-            nose.position.z = -11;
-            jet.add(nose);
-
-            const tail = new THREE.Mesh(
-                new THREE.ConeGeometry(1.0, 3, 12).rotateX(-Math.PI / 2),
-                matDark
-            );
-            tail.position.z = 11;
-            jet.add(tail);
-
+            const nose = new THREE.Mesh(new THREE.ConeGeometry(1.2, 4, 12).rotateX(Math.PI / 2), matDark);
+            nose.position.z = -11; jet.add(nose);
+            const tail = new THREE.Mesh(new THREE.ConeGeometry(1.0, 3, 12).rotateX(-Math.PI / 2), matDark);
+            tail.position.z = 11; jet.add(tail);
             const wingGeo = new THREE.BoxGeometry(14, 0.4, 4);
             const leftWing = new THREE.Mesh(wingGeo, matDark);
-            leftWing.position.set(-7, 0, -1);
-            leftWing.rotation.y = 0.25;
-            jet.add(leftWing);
-
+            leftWing.position.set(-7, 0, -1); leftWing.rotation.y = 0.25; jet.add(leftWing);
             const rightWing = leftWing.clone();
-            rightWing.position.x = 7;
-            rightWing.rotation.y = -0.25;
-            jet.add(rightWing);
-
+            rightWing.position.x = 7; rightWing.rotation.y = -0.25; jet.add(rightWing);
             const stabGeo = new THREE.BoxGeometry(0.6, 4, 3);
             const leftStab = new THREE.Mesh(stabGeo, matDark);
-            leftStab.position.set(-2, 2, 8);
-            leftStab.rotation.x = -0.4;
-            jet.add(leftStab);
-
+            leftStab.position.set(-2, 2, 8); leftStab.rotation.x = -0.4; jet.add(leftStab);
             const rightStab = leftStab.clone();
-            rightStab.position.x = 2;
-            jet.add(rightStab);
-
+            rightStab.position.x = 2; jet.add(rightStab);
             jet.scale.set(1.2, 1.2, 1.2);
-            jet.position.set(0, 120, -2000);
-
+            jet.position.set((Math.random() - 0.5) * 5000, 1000 + Math.random() * 500, -5000);
             jet.alive = true;
             scene.add(jet);
             return jet;
         }
 
         // AIRCRAFT
-        // ==========================================
-        // AIRCRAFT (GEOMETRIC F-15 EAGLE)
-        // ==========================================
         const planeGrp = new THREE.Group();
         scene.add(planeGrp);
 
-        // --- MATERIALS ---
-        const matChassis = new THREE.MeshStandardMaterial({ color: 0x6b7782, metalness: 0.5, roughness: 0.6 });
-        const matDark = new THREE.MeshStandardMaterial({ color: 0x2a353f, metalness: 0.7, roughness: 0.4 });
-        const matGlass = new THREE.MeshPhysicalMaterial({ color: 0x050a10, metalness: 0.9, roughness: 0.1, transparent: true, opacity: 0.8 });
-
-        // --- FUSELAGE & NOSE ---
         planeGrp.add(new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.2, 11, 32).rotateX(Math.PI / 2), matChassis));
         planeGrp.add(new THREE.Mesh(new THREE.ConeGeometry(1.2, 5, 32).rotateX(-Math.PI / 2).translate(0, 0, -8), matDark));
-
-        // --- COCKPIT ---
         const canopy = new THREE.Mesh(new THREE.SphereGeometry(0.8, 32, 16), matGlass);
-        canopy.scale.set(1.2, 1.2, 3.5);
-        canopy.position.set(0, 0.8, -4.5);
-        planeGrp.add(canopy);
-
-        // --- AIR INTAKES ---
+        canopy.scale.set(1.2, 1.2, 3.5); canopy.position.set(0, 0.8, -4.5); planeGrp.add(canopy);
         const leftIntake = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.6, 5), matDark);
-        leftIntake.position.set(-1.5, 0, -2);
-        planeGrp.add(leftIntake);
+        leftIntake.position.set(-1.5, 0, -2); planeGrp.add(leftIntake);
         const rightIntake = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.6, 5), matDark);
-        rightIntake.position.set(1.5, 0, -2);
-        planeGrp.add(rightIntake);
+        rightIntake.position.set(1.5, 0, -2); planeGrp.add(rightIntake);
 
-        // --- CUSTOM AERODYNAMIC SHAPES ---
         const extrudeSettings = { depth: 0.15, bevelEnabled: true, bevelThickness: 0.05, bevelSize: 0.05, bevelSegments: 3 };
-
-        // 1. MAIN WINGS (Swept F-15 Profile)
         const wingShape = new THREE.Shape();
-        wingShape.moveTo(0, 0);
-        wingShape.lineTo(6, 4);
-        wingShape.lineTo(6, 5.5);
-        wingShape.lineTo(0, 5.5);
-        wingShape.lineTo(0, 0);
-
+        wingShape.moveTo(0, 0); wingShape.lineTo(6, 4); wingShape.lineTo(6, 5.5); wingShape.lineTo(0, 5.5); wingShape.lineTo(0, 0);
         const wingGeo = new THREE.ExtrudeGeometry(wingShape, extrudeSettings);
         wingGeo.rotateX(Math.PI / 2);
+        const rWing = new THREE.Mesh(wingGeo, matChassis); rWing.position.set(1, 0, -1); planeGrp.add(rWing);
+        const lWing = new THREE.Mesh(wingGeo, matChassis); lWing.rotation.z = Math.PI; lWing.position.set(-1, 0, -1); planeGrp.add(lWing);
 
-        const rightWing = new THREE.Mesh(wingGeo, matChassis);
-        rightWing.position.set(1, 0, -1);
-        planeGrp.add(rightWing);
-
-        const leftWing = new THREE.Mesh(wingGeo, matChassis);
-        leftWing.rotation.z = Math.PI; // Mirrored
-        leftWing.position.set(-1, 0, -1);
-        planeGrp.add(leftWing);
-
-        // 2. REAR ELEVATORS (Stabilators)
         const elevShape = new THREE.Shape();
-        elevShape.moveTo(0, 0);
-        elevShape.lineTo(3.5, 2.5);
-        elevShape.lineTo(3.5, 3.5);
-        elevShape.lineTo(0, 3.5);
-
+        elevShape.moveTo(0, 0); elevShape.lineTo(3.5, 2.5); elevShape.lineTo(3.5, 3.5); elevShape.lineTo(0, 3.5);
         const elevGeo = new THREE.ExtrudeGeometry(elevShape, extrudeSettings);
         elevGeo.rotateX(Math.PI / 2);
+        const rElev = new THREE.Mesh(elevGeo, matChassis); rElev.position.set(1, 0, 4.5); planeGrp.add(rElev);
+        const lElev = new THREE.Mesh(elevGeo, matChassis); lElev.rotation.z = Math.PI; lElev.position.set(-1, 0, 4.5); planeGrp.add(lElev);
 
-        const rightElev = new THREE.Mesh(elevGeo, matChassis);
-        rightElev.position.set(1, 0, 4.5);
-        planeGrp.add(rightElev);
-
-        const leftElev = new THREE.Mesh(elevGeo, matChassis);
-        leftElev.rotation.z = Math.PI;
-        leftElev.position.set(-1, 0, 4.5);
-        planeGrp.add(leftElev);
-
-        // 3. TWIN VERTICAL TAIL FINS
         const tailShape = new THREE.Shape();
-        tailShape.moveTo(0, 0);
-        tailShape.lineTo(2.5, 3.5);
-        tailShape.lineTo(3.5, 3.6);
-        tailShape.lineTo(1.5, 0);
-
+        tailShape.moveTo(0, 0); tailShape.lineTo(2.5, 3.5); tailShape.lineTo(3.5, 3.6); tailShape.lineTo(1.5, 0);
         const tailGeo = new THREE.ExtrudeGeometry(tailShape, extrudeSettings);
         tailGeo.rotateY(-Math.PI / 2);
+        const rTail = new THREE.Mesh(tailGeo, matDark); rTail.position.set(1.5, 1.4, 4); rTail.rotation.z = -0.15; planeGrp.add(rTail);
+        const lTail = new THREE.Mesh(tailGeo, matDark); lTail.position.set(-1.5, 1.4, 4); lTail.rotation.z = 0.15; planeGrp.add(lTail);
 
-        const rightTail = new THREE.Mesh(tailGeo, matDark);
-        rightTail.position.set(1.5, 1.4, 4);
-        rightTail.rotation.z = -0.15;
-        planeGrp.add(rightTail);
-
-        const leftTail = new THREE.Mesh(tailGeo, matDark);
-        leftTail.position.set(-1.5, 1.4, 4);
-        leftTail.rotation.z = 0.15;
-        planeGrp.add(leftTail);
-
-        // --- DECALS (PALESTINIAN FLAG) ---
         function createFlagDecal() {
             const flagGrp = new THREE.Group();
-
             const blackMat = new THREE.MeshBasicMaterial({ color: 0x111111, side: THREE.DoubleSide });
             const whiteMat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
             const greenMat = new THREE.MeshBasicMaterial({ color: 0x007a3d, side: THREE.DoubleSide });
             const redMat = new THREE.MeshBasicMaterial({ color: 0xce1126, side: THREE.DoubleSide });
-
             const stripeGeo = new THREE.PlaneGeometry(1.2, 0.3);
-            const black = new THREE.Mesh(stripeGeo, blackMat);
-            black.position.y = 0.3;
-            flagGrp.add(black);
-            const white = new THREE.Mesh(stripeGeo, whiteMat);
-            flagGrp.add(white);
-            const green = new THREE.Mesh(stripeGeo, greenMat);
-            green.position.y = -0.3;
-            flagGrp.add(green);
-
+            const black = new THREE.Mesh(stripeGeo, blackMat); black.position.y = 0.3; flagGrp.add(black);
+            const white = new THREE.Mesh(stripeGeo, whiteMat); flagGrp.add(white);
+            const green = new THREE.Mesh(stripeGeo, greenMat); green.position.y = -0.3; flagGrp.add(green);
             const triangleShape = new THREE.Shape();
-            triangleShape.moveTo(-0.6, 0.45);
-            triangleShape.lineTo(0.1, 0);
-            triangleShape.lineTo(-0.6, -0.45);
-            triangleShape.lineTo(-0.6, 0.45);
-
+            triangleShape.moveTo(-0.6, 0.45); triangleShape.lineTo(0.1, 0); triangleShape.lineTo(-0.6, -0.45); triangleShape.lineTo(-0.6, 0.45);
             const triangleGeo = new THREE.ShapeGeometry(triangleShape);
-            const triangle = new THREE.Mesh(triangleGeo, redMat);
-            triangle.position.z = 0.01;
-            flagGrp.add(triangle);
-
+            const triangle = new THREE.Mesh(triangleGeo, redMat); triangle.position.z = 0.01; flagGrp.add(triangle);
             return flagGrp;
         }
+        const leftFlag = createFlagDecal(); leftFlag.scale.set(0.6, 0.6, 0.6); leftFlag.position.set(-1.6, 2.0, 4.2); leftFlag.rotation.y = -Math.PI / 2; leftFlag.rotation.x = -0.15; planeGrp.add(leftFlag);
+        const rightFlag = createFlagDecal(); rightFlag.scale.set(-0.6, 0.6, 0.6); rightFlag.position.set(1.6, 2.0, 4.2); rightFlag.rotation.y = Math.PI / 2; rightFlag.rotation.x = -0.15; planeGrp.add(rightFlag);
 
-        const leftFlag = createFlagDecal();
-        leftFlag.scale.set(0.6, 0.6, 0.6);
-        leftFlag.position.set(-1.6, 2.0, 4.2);
-        leftFlag.rotation.y = -Math.PI / 2;
-        leftFlag.rotation.x = -0.15;
-        planeGrp.add(leftFlag);
-
-        const rightFlag = createFlagDecal();
-        rightFlag.scale.set(-0.6, 0.6, 0.6); // Negative X scale faces triangle forward
-        rightFlag.position.set(1.6, 2.0, 4.2);
-        rightFlag.rotation.y = Math.PI / 2;
-        rightFlag.rotation.x = -0.15;
-        planeGrp.add(rightFlag);
-
-        // --- ENGINE EXHAUSTS & AFTERBURNERS ---
         planeGrp.add(new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 2, 16).rotateX(Math.PI / 2).translate(-1, 0, 6.5), matDark));
         planeGrp.add(new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.9, 2, 16).rotateX(Math.PI / 2).translate(1, 0, 6.5), matDark));
-
-        const afterburner = new THREE.Group();
-        afterburner.position.set(0, 0, 7.5);
-        afterburner.rotation.x = Math.PI / 2;
-
+        const afterburner = new THREE.Group(); afterburner.position.set(0, 0, 7.5); afterburner.rotation.x = Math.PI / 2;
         const abMat = new THREE.MeshBasicMaterial({ color: 0x00ccff, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending });
         const flameGeo = new THREE.ConeGeometry(0.6, 4, 16).translate(0, -2, 0);
-
-        const leftFlame = new THREE.Mesh(flameGeo, abMat);
-        leftFlame.position.set(-1, 0, 0);
-        afterburner.add(leftFlame);
-
-        const rightFlame = new THREE.Mesh(flameGeo, abMat);
-        rightFlame.position.set(1, 0, 0);
-        afterburner.add(rightFlame);
-
+        const lFlame = new THREE.Mesh(flameGeo, abMat); lFlame.position.set(-1, 0, 0); afterburner.add(lFlame);
+        const rFlame = new THREE.Mesh(flameGeo, abMat); rFlame.position.set(1, 0, 0); afterburner.add(rFlame);
         planeGrp.add(afterburner);
+
         // PARTICLES
         const maxPart = 800;
         const pMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1.0 });
@@ -885,7 +730,6 @@
                 if (p.l <= 0 && activeCount < targetCount) {
                     p.m.position.copy(pos);
                     const t = Math.random() * Math.PI * 2, ph = Math.acos(Math.random() * 2 - 1), r = Math.random() * scale + (scale / 2);
-
                     if (type === 'explosion' || type === 'flak') {
                         p.v.set(r * Math.sin(ph) * Math.cos(t), Math.abs(r * Math.cos(ph)) + scale / 2, r * Math.sin(ph) * Math.sin(t));
                         p.m.material.color.setHex(Math.random() > 0.4 ? 0xff4400 : 0x222222);
@@ -899,46 +743,23 @@
                         p.v.set((Math.random() - 0.5) * 0.5, (Math.random() - 0.5) * 0.5, (Math.random() - 0.5) * 0.5);
                         p.m.material.color.setHex(0xaaaaaa);
                     }
-
                     p.l = 1.0; p.type = type; p.m.visible = true; activeCount++;
                 }
             });
         }
 
         // PHYSICS & VARS
-        let throttle = 0;
-        let speed = 0;
-        let isGrounded = true;
-        let currentBaseSpeed = 6.0;
-        let playerMaxHp = 100;
-        let playerHp = 100;
-        // === ENEMY JETS ===
-        let enemyJets = [];
-
-        // === ENEMY MISSILES ===
-        let enemyMissiles = [];
-        let missileWarning = new Audio("sounds/deedle_deedle.mp3");
-        missileWarning.volume = 1.0;
-        missileWarning.loop = false;
-        let warningCooldown = 0;
-
-        // === FLARES ===
-        let flares = [];
-        // Pause system
+        let throttle = 0; let speed = 0; let isGrounded = true; let currentBaseSpeed = 6.0;
+        let playerMaxHp = 100; let playerHp = 100;
+        let enemyJets = []; let enemyMissiles = [];
+        let warningCooldown = 0; let flares = [];
         let isPaused = false;
         let bombs = []; let bombCount = 10;
         let bullets = []; let enemyBullets = [];
         let gunCooldown = 0; let enemyFireTimer = 0;
         const flightDeckY = 41.5;
-
         const xAxis = new THREE.Vector3(1, 0, 0); const yAxis = new THREE.Vector3(0, 1, 0); const zAxis = new THREE.Vector3(0, 0, 1);
-
-        const keys = {
-            keyw: 0, keya: 0, keys: 0, keyd: 0,
-            arrowup: 0, arrowdown: 0, arrowleft: 0, arrowright: 0,
-            space: 0, keyf: 0, keyz: 0,
-            keyp: 0
-        };
+        const keys = { keyw: 0, keya: 0, keys: 0, keyd: 0, arrowup: 0, arrowdown: 0, arrowleft: 0, arrowright: 0, space: 0, keyf: 0, keyz: 0, keyp: 0 };
 
         window.onkeydown = e => { if (keys[e.code.toLowerCase()] !== undefined) keys[e.code.toLowerCase()] = 1; };
         window.onkeyup = e => {
@@ -948,55 +769,53 @@
                 isPaused = !isPaused;
                 document.getElementById('pauseScreen').style.display = isPaused ? 'flex' : 'none';
             }
-            if (e.code === "KeyF" && gameState === "playing") {
-                dropFlares();
-            }
-
-
+            if (e.code === "KeyF" && gameState === "playing") dropFlares();
         };
 
-        // MOUSE RAYCASTING FOR TARGET LOCK
-        const raycaster = new THREE.Raycaster();
-        const mouse = new THREE.Vector2();
-
+        const raycaster = new THREE.Raycaster(); const mouse = new THREE.Vector2();
         window.addEventListener('mousedown', (event) => {
             if (gameState !== 'playing') return;
-            initAudio(); // Initialize audio context on click
-
-            // Normalize mouse coordinates (-1 to +1)
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
+            initAudio();
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1; mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
-
-            // Check if user clicked the enemy ship
             const intersects = raycaster.intersectObject(enemyShip, true);
-            if (intersects.length > 0 && enemyAlive) {
-                isTargetLocked = true;
-                sysAudio('lock');
-            } else {
-                isTargetLocked = false;
-            }
+            if (intersects.length > 0 && enemyAlive) { isTargetLocked = true; sysAudio('lock'); }
+            else { isTargetLocked = false; }
         });
 
         function fireMissile() {
             bombCount--; document.getElementById('bombText').innerText = `${bombCount} / 10`;
             sysAudio('launch');
-
             const bombGrp = new THREE.Group();
-            const bBody = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.0, 8).rotateX(Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xdddddd }));
-            const bTail = new THREE.Mesh(new THREE.BoxGeometry(3, 3, 1.5), new THREE.MeshStandardMaterial({ color: 0xff3300 }));
-            bTail.position.set(0, 0, -4); bombGrp.add(bBody, bTail);
-
+            const bBody = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 4).rotateX(Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xdddddd }));
+            const bTail = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1.5, 0.75), new THREE.MeshStandardMaterial({ color: 0xff3300 }));
+            bTail.position.set(0, 0, -2); bombGrp.add(bBody, bTail);
             bombGrp.position.copy(planeGrp.position); bombGrp.position.y -= 2.5; bombGrp.rotation.copy(planeGrp.rotation);
             scene.add(bombGrp);
-
             const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(planeGrp.quaternion);
             const missileSpeed = Math.max(speed + 5.0, 15.0);
             const bombVel = forward.multiplyScalar(missileSpeed);
-
-            // Check if UI says we are locked
             bombs.push({ mesh: bombGrp, vel: bombVel, isHoming: isTargetLocked });
+        }
+
+        function fireEnemyMissile(jet) {
+            const missile = new THREE.Group();
+            const body = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 6, 8).rotateX(Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xff2222 }));
+            missile.add(body);
+            missile.position.copy(jet.position); missile.quaternion.copy(jet.quaternion);
+            const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(jet.quaternion);
+            enemyMissiles.push({ mesh: missile, vel: forward.multiplyScalar(20), life: 600 });
+            scene.add(missile);
+        }
+
+        function dropFlares() {
+            for (let i = 0; i < 6; i++) {
+                const flare = new THREE.Mesh(new THREE.SphereGeometry(1.2, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffaa55, transparent: true }));
+                flare.position.copy(planeGrp.position);
+                flare.position.x += (Math.random() - 0.5) * 10; flare.position.y += (Math.random() - 0.5) * 5; flare.position.z += (Math.random() - 0.5) * 10;
+                flares.push({ mesh: flare, life: 80 });
+                scene.add(flare);
+            }
         }
 
         function flashDamage() {
@@ -1008,17 +827,11 @@
             if (!enemyAlive) return;
             enemyHp -= amount;
             document.getElementById('enemyHpBar').style.width = Math.max(0, (enemyHp / enemyMaxHp) * 100) + '%';
-
             if (enemyHp <= 0) {
-                enemyAlive = false;
-                isTargetLocked = false;
+                enemyAlive = false; isTargetLocked = false;
                 document.getElementById('enemyBlip').style.display = 'none';
                 document.getElementById('lockOnUI').style.display = 'none';
-
-                if (!isKamikaze) {
-                    screenShake = 40.0; triggerParticleEvent(enemyShip.position, 'explosion', 80);
-                }
-
+                if (!isKamikaze) { screenShake = 40.0; triggerParticleEvent(enemyShip.position, 'explosion', 80); }
                 if (gameState === "playing" && !isKamikaze) {
                     setTimeout(() => {
                         gameState = "levelTransition";
@@ -1045,6 +858,7 @@
             bombs.forEach(b => scene.remove(b.mesh)); bombs = [];
             bullets.forEach(b => scene.remove(b.mesh)); bullets = [];
             enemyBullets.forEach(b => scene.remove(b.mesh)); enemyBullets = [];
+            enemyMissiles.forEach(m => scene.remove(m.mesh)); enemyMissiles = [];
             document.getElementById('lvlText').innerText = level;
         }
 
@@ -1054,204 +868,136 @@
             playerHp = Math.min(playerMaxHp, playerHp + 30);
             document.getElementById('hpBar').style.width = (playerHp / playerMaxHp) * 100 + '%';
             resetToCarrier(); respawnEnemy(); gameState = "playing";
-            // Remove old jet radar blips
-            enemyJets.forEach((_, index) => {
-                const old = document.getElementById('jetBlip' + index);
-                if (old) old.remove();
-            });
-
-            // Spawn more jets each level
-            let jetCount = Math.min(1 + Math.floor(level / 2), 6); // caps at 6 jets
+            enemyJets.forEach(jet => scene.remove(jet));
             enemyJets = [];
+            let jetCount = Math.min(1 + Math.floor(level / 2), 6);
+            for (let i = 0; i < jetCount; i++) enemyJets.push(createEnemyJet());
+        }
 
-            for (let i = 0; i < jetCount; i++) {
-                enemyJets.push(createEnemyJet());
+        function triggerCrash(reason, isKamikaze = false) {
+            if (gameState === "crashed") return;
+            gameState = "crashed"; planeGrp.visible = false; document.getElementById('warningText').style.opacity = 0;
+            document.getElementById('lockOnUI').style.display = 'none';
+            sysAudio('explode');
+            if (isKamikaze) {
+                screenShake = 120.0; triggerParticleEvent(enemyShip.position, 'nuke', 200);
+                setTimeout(() => triggerParticleEvent(enemyShip.position, 'nuke', 250), 300);
+                setTimeout(() => triggerParticleEvent(enemyShip.position, 'explosion', 150), 600);
+                setTimeout(() => {
+                    document.getElementById('levelScreen').style.display = 'flex';
+                    document.getElementById('levelMessage').innerText = "KAMIKAZE SUCCESS";
+                    document.getElementById('levelSub').innerText = "TARGET DESTROYED. PREPARE NEXT JET.";
+                    setTimeout(nextLevel, 4000);
+                }, 2500);
+            } else {
+                screenShake = 30.0; triggerParticleEvent(planeGrp.position, 'explosion', 40);
+                setTimeout(() => {
+                    document.getElementById('endScreen').style.display = 'flex';
+                    document.getElementById('endSub').innerText = reason;
+                }, 2000);
             }
-
         }
 
         function animate() {
             requestAnimationFrame(animate);
             let time = Date.now() * 0.001;
-
             if (oceanMat.userData.shader) oceanMat.userData.shader.uniforms.time.value = time;
 
             if (gameState === "playing") {
-                if (isPaused) {
-                    renderer.render(scene, camera);
-                    return;
-                }
+                if (isPaused) { renderer.render(scene, camera); return; }
                 if (keys.keyw) throttle = Math.min(1.0, throttle + 0.005);
                 if (keys.keys) throttle = Math.max(0.0, throttle - 0.01);
                 let currentMaxSpeed = throttle > 0.8 ? currentBaseSpeed * 1.5 : currentBaseSpeed;
                 speed += ((throttle * currentMaxSpeed) - speed) * 0.015;
-
-
                 afterburner.visible = throttle > 0.8 && !isGrounded;
-                if(afterburner.visible) afterburner.scale.set(1, 1 + Math.random()*0.5, 1);
+                if (afterburner.visible) afterburner.scale.set(1, 1 + Math.random() * 0.5, 1);
 
-
-                // SIMPLIFIED STEERING (NO ROLL)
                 if (speed > 0.1) {
-                    if (keys.keya || keys.arrowleft) planeGrp.rotateOnAxis(yAxis, 0.02); // Flat Yaw
-                    if (keys.keyd || keys.arrowright) planeGrp.rotateOnAxis(yAxis, -0.02); // Flat Yaw
+                    if (keys.keya || keys.arrowleft) planeGrp.rotateOnAxis(yAxis, 0.02);
+                    if (keys.keyd || keys.arrowright) planeGrp.rotateOnAxis(yAxis, -0.02);
                 }
-
                 if (speed > 1.2 || !isGrounded) {
-                    if (keys.arrowup) planeGrp.rotateOnAxis(xAxis, 0.025); // Pitch Up
-                    if (keys.arrowdown) planeGrp.rotateOnAxis(xAxis, -0.025); // Pitch Down
+                    if (keys.arrowup) planeGrp.rotateOnAxis(xAxis, 0.025);
+                    if (keys.arrowdown) planeGrp.rotateOnAxis(xAxis, -0.025);
                 }
-
                 planeGrp.translateZ(-speed);
                 let vertVel = (speed * 0.015) - 0.04;
                 let waveHeight = Math.sin(planeGrp.position.x * 0.01 + time) * 6 + Math.cos(planeGrp.position.z * 0.015 + time * 1.2) * 6;
                 let groundY = waveHeight; let onDeck = false;
-
                 if (Math.abs(planeGrp.position.x - carrierGrp.position.x) < 40 &&
                     planeGrp.position.z > carrierGrp.position.z - 700 &&
                     planeGrp.position.z < carrierGrp.position.z + 700 && planeGrp.position.y > 35) {
                     groundY = flightDeckY; onDeck = true;
                 }
-
                 if (planeGrp.position.y <= groundY) {
-                    planeGrp.position.y = groundY; 
-                    isGrounded = true;
-
-                    // AUTO GEAR TEXT
+                    planeGrp.position.y = groundY; isGrounded = true;
                     document.getElementById('gearText').innerText = "DOWN";
-
-                    // REARMING GOES RIGHT HERE
                     if (onDeck) {
-                        bombCount = 10;
-                        playerHp = playerMaxHp;
-
+                        bombCount = 10; playerHp = playerMaxHp;
                         document.getElementById('hpBar').style.width = '100%';
                         document.getElementById('bombText').innerText = bombCount + " / 10";
-
-                        document.getElementById('objectiveHud').innerText = "REARMING COMPLETE";
-                        setTimeout(() => {
-                            document.getElementById('objectiveHud').innerText = "OBJECTIVE: ENGAGE HOSTILES";
-                        }, 2000);
                     }
-
-                    // TOUCHDOWN ROTATION
                     const eul = new THREE.Euler().setFromQuaternion(planeGrp.quaternion, 'YXZ');
-                    eul.x *= 0.8; 
-                    planeGrp.quaternion.setFromEuler(eul);
-
-                    // CRASH CHECKS
+                    eul.x *= 0.8; planeGrp.quaternion.setFromEuler(eul);
                     if (!onDeck) triggerCrash("DITCHED IN OCEAN");
                     else if (onDeck && (vertVel < -0.4 || speed > 2.0 && planeGrp.position.z < -650)) triggerCrash("DECK CRASH");
-
                 } else {
-                    isGrounded = false; 
-                    document.getElementById('gearText').innerText = "UP";
+                    isGrounded = false; document.getElementById('gearText').innerText = "UP";
                     planeGrp.position.y += vertVel;
                 }
 
-
                 enemyShip.updateMatrixWorld();
-
                 const planeLocalPos = planeGrp.position.clone();
                 enemyShip.worldToLocal(planeLocalPos);
                 if (enemyAlive && Math.abs(planeLocalPos.x) < 60 && Math.abs(planeLocalPos.z) < 280 && planeLocalPos.y < 80 && planeLocalPos.y > -20) {
-                    if (bombCount === 0) {
-                        damageEnemy(999, true);
-                        triggerCrash("HONORABLE SACRIFICE", true);
-                    } else {
-                        triggerCrash("CRASHED INTO TARGET");
-                    }
+                    if (bombCount === 0) { damageEnemy(999, true); triggerCrash("HONORABLE SACRIFICE", true); }
+                    else { triggerCrash("CRASHED INTO TARGET"); }
                 }
 
                 for (let i = bombs.length - 1; i >= 0; i--) {
                     let b = bombs[i];
-                    // === ENEMY SHIP / CARRIER HIT DETECTION ===
-                    if (enemyShip && b.position.distanceTo(enemyShip.position) < 120) {
-
-                        carrierHp--; // or enemyShipHp-- if you prefer
-
-                        triggerParticleEvent(b.position, 'explosion', 40);
-
-                        scene.remove(b);
-                        bombs.splice(i, 1);
-
-                        if (carrierHp <= 0) {
-                            destroyEnemyShip(); // you can define this
-                        }
-
-                        continue;
-                    }
-
-                    // SLIGHT AIM ASSIST LOGIC
                     if (b.isHoming && enemyAlive) {
-                        let targetPos = enemyShip.position.clone();
-                        targetPos.y += 15;
+                        let targetPos = enemyShip.position.clone(); targetPos.y += 15;
                         let dir = targetPos.sub(b.mesh.position).normalize();
                         let currentSpeed = b.vel.length();
-                        // Reduced from 0.04 to 0.008 for "slight nudge" aim assist
                         b.vel.lerp(dir.multiplyScalar(currentSpeed), 0.008);
                         b.mesh.lookAt(b.mesh.position.clone().add(b.vel));
                     } else {
-                        b.vel.y -= 0.02; // Gravity for dumb bombs
-                        b.mesh.rotateOnAxis(xAxis, -0.01);
+                        b.vel.y -= 0.02; b.mesh.rotateOnAxis(xAxis, -0.01);
                     }
-
                     b.mesh.position.add(b.vel);
                     if (Math.random() > 0.3) triggerParticleEvent(b.mesh.position, 'smoke', 4);
-
                     if (b.mesh.position.y <= 0) {
                         sysAudio('splash'); triggerParticleEvent(b.mesh.position, 'splash', 25);
                         scene.remove(b.mesh); bombs.splice(i, 1); continue;
                     }
-
-                    const localPos = b.mesh.position.clone();
-                    enemyShip.worldToLocal(localPos);
-
+                    const localPos = b.mesh.position.clone(); enemyShip.worldToLocal(localPos);
                     if (enemyAlive && Math.abs(localPos.x) < 60 && Math.abs(localPos.z) < 280 && localPos.y < 80 && localPos.y > -20) {
-                        sysAudio('explode'); screenShake = 20.0;
-                        triggerParticleEvent(b.mesh.position, 'explosion', 35);
-                        scene.remove(b.mesh); bombs.splice(i, 1);
-                        damageEnemy(3.0);
+                        sysAudio('explode'); screenShake = 20.0; triggerParticleEvent(b.mesh.position, 'explosion', 35);
+                        scene.remove(b.mesh); bombs.splice(i, 1); damageEnemy(3.0);
                     }
                 }
 
-                // Enemy AI & UI Locking
                 if (enemyAlive) {
-                    const shipPos2D = enemyShip.position.clone();
-                    shipPos2D.y += 30;
-                    shipPos2D.project(camera);
-
+                    const shipPos2D = enemyShip.position.clone(); shipPos2D.y += 30; shipPos2D.project(camera);
                     const lockUI = document.getElementById('lockOnUI');
-                    // Only show UI if target is actively locked
                     if (isTargetLocked && shipPos2D.z < 1) {
-                        const x = (shipPos2D.x * .5 + .5) * window.innerWidth;
-                        const y = (-(shipPos2D.y * .5) + .5) * window.innerHeight;
-                        lockUI.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`;
-                        lockUI.style.display = 'block';
-                    } else {
-                        lockUI.style.display = 'none';
-                    }
-                    // === ENEMY JET AI ===
+                        const x = (shipPos2D.x * .5 + .5) * window.innerWidth; const y = (-(shipPos2D.y * .5) + .5) * window.innerHeight;
+                        lockUI.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`; lockUI.style.display = 'block';
+                    } else { lockUI.style.display = 'none'; }
+
                     enemyJets.forEach(jet => {
                         if (!jet.alive) return;
-
                         const toPlayer = planeGrp.position.clone().sub(jet.position);
                         const dist = toPlayer.length();
-
                         const desiredDir = toPlayer.normalize();
                         const currentDir = new THREE.Vector3(0, 0, -1).applyQuaternion(jet.quaternion);
-
                         const turnRate = 0.02;
                         const newDir = currentDir.lerp(desiredDir, turnRate).normalize();
                         jet.lookAt(jet.position.clone().add(newDir));
-
                         jet.translateZ(-2.5);
-
-                        if (dist < 1500 && Math.random() < 0.01) {
-                            fireEnemyMissile(jet);
-                        }
+                        if (dist < 1500 && Math.random() < 0.01) fireEnemyMissile(jet);
                     });
-
 
                     let distToPlayer = planeGrp.position.distanceTo(enemyShip.position);
                     turrets.forEach(t => {
@@ -1259,28 +1005,6 @@
                         target.add(new THREE.Vector3(0, 0, -speed * 20).applyQuaternion(planeGrp.quaternion));
                         t.lookAt(target);
                     });
-                    function fireEnemyMissile(jet) {
-                        const missile = new THREE.Group();
-
-                        const body = new THREE.Mesh(
-                            new THREE.CylinderGeometry(0.4, 0.4, 6, 8).rotateX(Math.PI / 2),
-                            new THREE.MeshBasicMaterial({ color: 0xff2222 })
-                        );
-                        missile.add(body);
-
-                        missile.position.copy(jet.position);
-                        missile.quaternion.copy(jet.quaternion);
-
-                        const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(jet.quaternion);
-
-                        enemyMissiles.push({
-                            mesh: missile,
-                            vel: forward.multiplyScalar(20),
-                            life: 600
-                        });
-
-                        scene.add(missile);
-                    }
 
                     if (distToPlayer < 12000 && planeGrp.position.y > 50) {
                         enemyFireTimer++;
@@ -1299,12 +1023,9 @@
                         }
                     }
 
-                    let dx = enemyShip.position.x - planeGrp.position.x;
-                    let dz = enemyShip.position.z - planeGrp.position.z;
-                    let scale = 75 / 30000;
-                    let rx = dx * scale; let rz = dz * scale;
-                    let distUI = Math.sqrt(rx * rx + rz * rz);
-                    if (distUI > 70) { rx = (rx / distUI) * 70; rz = (rz / distUI) * 70; }
+                    let dx = enemyShip.position.x - planeGrp.position.x; let dz = enemyShip.position.z - planeGrp.position.z;
+                    let scale = 75 / 30000; let rx = dx * scale; let rz = dz * scale;
+                    let distUI = Math.sqrt(rx * rx + rz * rz); if (distUI > 70) { rx = (rx / distUI) * 70; rz = (rz / distUI) * 70; }
                     document.getElementById('enemyBlip').style.transform = `translate(${rx}px, ${rz}px)`;
                 }
 
@@ -1318,69 +1039,32 @@
                     if (b.mesh.position.distanceTo(planeGrp.position) < 25) {
                         sysAudio('pew'); flashDamage(); triggerParticleEvent(planeGrp.position, 'flak', 5);
                         scene.remove(b.mesh); enemyBullets.splice(i, 1);
-                        playerHp -= 10;
-                        document.getElementById('hpBar').style.width = Math.max(0, (playerHp / playerMaxHp) * 100) + '%';
+                        playerHp -= 10; document.getElementById('hpBar').style.width = Math.max(0, (playerHp / playerMaxHp) * 100) + '%';
                         if (playerHp <= 0) triggerCrash("SHOT DOWN");
                     }
                 }
-                // === ENEMY MISSILES ===
+
                 for (let i = enemyMissiles.length - 1; i >= 0; i--) {
                     let m = enemyMissiles[i];
-
                     const targetDir = planeGrp.position.clone().sub(m.mesh.position).normalize();
                     m.vel.lerp(targetDir.multiplyScalar(25), 0.05);
-
-                    m.mesh.position.add(m.vel);
-                    m.mesh.lookAt(m.mesh.position.clone().add(m.vel));
-                    // Missile warning tone
-                    if (warningCooldown <= 0) {
-                        if (m.mesh.position.distanceTo(planeGrp.position) < 300) {
-                            missileWarning.currentTime = 0;
-                            missileWarning.play();
-                            warningCooldown = 60; // 1 second cooldown
-                        }
+                    m.mesh.position.add(m.vel); m.mesh.lookAt(m.mesh.position.clone().add(m.vel));
+                    if (warningCooldown <= 0 && m.mesh.position.distanceTo(planeGrp.position) < 300) {
+                        sysAudio('lock'); // Use sysAudio for warning tone
+                        warningCooldown = 60;
                     }
-
                     m.life--;
-                    if (m.life <= 0) {
-                        scene.remove(m.mesh);
-                        enemyMissiles.splice(i, 1);
-                        continue;
-                    }
-                    // Check flares
+                    if (m.life <= 0) { scene.remove(m.mesh); enemyMissiles.splice(i, 1); continue; }
                     for (let f of flares) {
                         if (m.mesh.position.distanceTo(f.mesh.position) < 30) {
                             triggerParticleEvent(f.mesh.position, 'explosion', 20);
-                            scene.remove(m.mesh);
-                            enemyMissiles.splice(i, 1);
-                            break;
+                            scene.remove(m.mesh); enemyMissiles.splice(i, 1); break;
                         }
                     }
-
-                    if (m.mesh.position.distanceTo(planeGrp.position) < 20) {
-                        flashDamage();
-                        playerHp -= 20;
-                        document.getElementById('hpBar').style.width = (playerHp/playerMaxHp)*100 + '%';
-                        scene.remove(m.mesh);
-                        enemyMissiles.splice(i, 1);
-
+                    if (enemyMissiles[i] && m.mesh.position.distanceTo(planeGrp.position) < 20) {
+                        flashDamage(); playerHp -= 20; document.getElementById('hpBar').style.width = (playerHp / playerMaxHp) * 100 + '%';
+                        scene.remove(m.mesh); enemyMissiles.splice(i, 1);
                         if (playerHp <= 0) triggerCrash("HIT BY MISSILE");
-                    }
-                }  
-                function dropFlares() {
-                    for (let i = 0; i < 6; i++) {
-                        const flare = new THREE.Mesh(
-                            new THREE.SphereGeometry(1.2, 8, 8),
-                            new THREE.MeshBasicMaterial({ color: 0xffaa55 })
-                        );
-
-                        flare.position.copy(planeGrp.position);
-                        flare.position.x += (Math.random() - 0.5) * 10;
-                        flare.position.y += (Math.random() - 0.5) * 5;
-                        flare.position.z += (Math.random() - 0.5) * 10;
-
-                        flares.push({ mesh: flare, life: 80 });
-                        scene.add(flare);
                     }
                 }
 
@@ -1390,82 +1074,35 @@
                 document.getElementById('altText').innerText = Math.max(0, Math.floor((planeGrp.position.y - waveHeight) * 10)).toString().padStart(4, '0');
                 const isStalling = (!isGrounded && speed < 1.5 && planeGrp.position.y > 50);
                 document.getElementById('warningText').style.opacity = isStalling ? 1 : 0;
-
-                // ZOOM CAMERA LOGIC (Z Key)
-                let targetFov = keys.keyz ? 25 : 60;
-                camera.fov += (targetFov - camera.fov) * 0.1;
-                camera.updateProjectionMatrix();
+                let targetFov = keys.keyz ? 25 : 60; camera.fov += (targetFov - camera.fov) * 0.1; camera.updateProjectionMatrix();
             }
 
             if (gameState === "playing" || gameState === "levelTransition") {
                 const offset = new THREE.Vector3(0, 25, 65).applyMatrix4(planeGrp.matrixWorld);
-                camera.position.lerp(offset, 0.1);
-                const look = planeGrp.position.clone(); look.y += 10; camera.lookAt(look);
+                camera.position.lerp(offset, 0.1); const look = planeGrp.position.clone(); look.y += 10; camera.lookAt(look);
             } else if (gameState === "menu") {
                 camera.position.set(100, 80, 250); camera.lookAt(0, 40, 0);
             }
-
             if (screenShake > 0) {
-                camera.position.x += (Math.random() - 0.5) * screenShake;
-                camera.position.y += (Math.random() - 0.5) * screenShake;
+                camera.position.x += (Math.random() - 0.5) * screenShake; camera.position.y += (Math.random() - 0.5) * screenShake;
                 screenShake = Math.max(0, screenShake - 0.5);
             }
-
             parts.forEach(p => {
                 if (p.l > 0) {
                     p.l -= (p.type === 'splash' ? 0.02 : (p.type === 'smoke' ? 0.04 : 0.015));
-                    p.m.position.add(p.v);
-                    if (p.type !== 'smoke') p.v.y -= 0.1;
+                    p.m.position.add(p.v); if (p.type !== 'smoke') p.v.y -= 0.1;
                     let scaleTarget = p.type === 'splash' ? 2 : (p.type === 'smoke' ? 3 : (p.type === 'nuke' ? 8 : 4));
                     p.m.scale.setScalar(p.l * scaleTarget);
                     if (p.m.position.y < 0 && p.type !== 'smoke') p.l = 0;
                     if (p.l <= 0) p.m.visible = false;
                 }
-                // === FLARES ===
-                for (let i = flares.length - 1; i >= 0; i--) {
-                    let f = flares[i];
-                    f.life--;
-                    f.mesh.material.opacity = f.life / 80;
-
-                    if (f.life <= 0) {
-                        scene.remove(f.mesh);
-                        flares.splice(i, 1);
-                    }
-                }
-
             });
+            for (let i = flares.length - 1; i >= 0; i--) {
+                let f = flares[i]; f.life--; f.mesh.material.opacity = f.life / 80;
+                if (f.life <= 0) { scene.remove(f.mesh); flares.splice(i, 1); }
+            }
             warningCooldown--;
             renderer.render(scene, camera);
-        }
-
-        function triggerCrash(reason, isKamikaze = false) {
-            if (gameState === "crashed") return;
-            gameState = "crashed"; planeGrp.visible = false; document.getElementById('warningText').style.opacity = 0;
-            document.getElementById('lockOnUI').style.display = 'none';
-            sysAudio('explode');
-
-            if (isKamikaze) {
-                screenShake = 120.0;
-                triggerParticleEvent(enemyShip.position, 'nuke', 200);
-                setTimeout(() => triggerParticleEvent(enemyShip.position, 'nuke', 250), 300);
-                setTimeout(() => triggerParticleEvent(enemyShip.position, 'explosion', 150), 600);
-
-                setTimeout(() => {
-                    document.getElementById('levelScreen').style.display = 'flex';
-                    document.getElementById('levelMessage').innerText = "KAMIKAZE SUCCESS";
-                    document.getElementById('levelSub').innerText = "TARGET DESTROYED. PREPARE NEXT JET.";
-                    setTimeout(() => {
-                        nextLevel();
-                    }, 4000);
-                }, 2500);
-            } else {
-                screenShake = 30.0;
-                triggerParticleEvent(planeGrp.position, 'explosion', 40);
-                setTimeout(() => {
-                    document.getElementById('endScreen').style.display = 'flex';
-                    document.getElementById('endSub').innerText = reason;
-                }, 2000);
-            }
         }
 
         window.onresize = () => { renderer.setSize(window.innerWidth, window.innerHeight); camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); };
