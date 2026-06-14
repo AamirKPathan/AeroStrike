@@ -1165,28 +1165,28 @@
                         target.add(new THREE.Vector3(0, 0, -speed * 20).applyQuaternion(planeGrp.quaternion));
                         t.lookAt(target);
                     });
-        function fireEnemyMissile(jet) {
-            const missile = new THREE.Group();
+                    function fireEnemyMissile(jet) {
+                        const missile = new THREE.Group();
 
-            const body = new THREE.Mesh(
-                new THREE.CylinderGeometry(0.4, 0.4, 6, 8).rotateX(Math.PI / 2),
-                new THREE.MeshBasicMaterial({ color: 0xff2222 })
-            );
-            missile.add(body);
+                        const body = new THREE.Mesh(
+                            new THREE.CylinderGeometry(0.4, 0.4, 6, 8).rotateX(Math.PI / 2),
+                            new THREE.MeshBasicMaterial({ color: 0xff2222 })
+                        );
+                        missile.add(body);
 
-            missile.position.copy(jet.position);
-            missile.quaternion.copy(jet.quaternion);
+                        missile.position.copy(jet.position);
+                        missile.quaternion.copy(jet.quaternion);
 
-            const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(jet.quaternion);
+                        const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(jet.quaternion);
 
-            enemyMissiles.push({
-                mesh: missile,
-                vel: forward.multiplyScalar(20),
-                life: 600
-            });
+                        enemyMissiles.push({
+                            mesh: missile,
+                            vel: forward.multiplyScalar(20),
+                            life: 600
+                        });
 
-            scene.add(missile);
-        }
+                        scene.add(missile);
+                    }
 
                     if (distToPlayer < 12000 && planeGrp.position.y > 50) {
                         enemyFireTimer++;
