@@ -524,6 +524,7 @@
         let gameState = "menu";
         let level = 1;
         let isTargetLocked = false;
+        let lockedTarget = null;
 
         // ENVIRONMENT
         const sky = new THREE.Mesh(new THREE.SphereGeometry(30000, 32, 15), new THREE.MeshBasicMaterial({ color: 0x4488dd, side: THREE.BackSide }));
@@ -778,9 +779,30 @@
             initAudio();
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1; mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
             raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObject(enemyShip, true);
-            if (intersects.length > 0 && enemyAlive) { isTargetLocked = true; sysAudio('lock'); }
-            else { isTargetLocked = false; }
+            
+            // Check ship first
+            const shipIntersects = raycaster.intersectObject(enemyShip, true);
+            if (shipIntersects.length > 0 && enemyAlive) { 
+                isTargetLocked = true; 
+                lockedTarget = enemyShip;
+                sysAudio('lock'); 
+                return;
+            }
+            
+            // Check jets
+            for (let jet of enemyJets) {
+                if (!jet.alive) continue;
+                const jetIntersects = raycaster.intersectObject(jet, true);
+                if (jetIntersects.length > 0) {
+                    isTargetLocked = true;
+                    lockedTarget = jet;
+                    sysAudio('lock');
+                    return;
+                }
+            }
+            
+            isTargetLocked = false;
+            lockedTarget = null;
         });
 
         function fireMissile() {
@@ -795,7 +817,7 @@
             const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(planeGrp.quaternion);
             const missileSpeed = Math.max(speed + 5.0, 15.0);
             const bombVel = forward.multiplyScalar(missileSpeed);
-            bombs.push({ mesh: bombGrp, vel: bombVel, isHoming: isTargetLocked });
+            bombs.push({ mesh: bombGrp, vel: bombVel, isHoming: isTargetLocked, target: lockedTarget });
         }
 
         function fireEnemyMissile(jet) {
@@ -969,11 +991,12 @@
 
                 for (let i = bombs.length - 1; i >= 0; i--) {
                     let b = bombs[i];
-                    if (b.isHoming && enemyAlive) {
-                        let targetPos = enemyShip.position.clone(); targetPos.y += 15;
+                    if (b.isHoming && b.target && (b.target === enemyShip ? enemyAlive : b.target.alive)) {
+                        let targetPos = b.target.position.clone();
+                        if (b.target === enemyShip) targetPos.y += 15;
                         let dir = targetPos.sub(b.mesh.position).normalize();
                         let currentSpeed = b.vel.length();
-                        b.vel.lerp(dir.multiplyScalar(currentSpeed), 0.008);
+                        b.vel.lerp(dir.multiplyScalar(currentSpeed), 0.015); // Increased homing strength
                         b.mesh.lookAt(b.mesh.position.clone().add(b.vel));
                     } else {
                         b.vel.y -= 0.02; b.mesh.rotateOnAxis(xAxis, -0.01);
@@ -988,16 +1011,32 @@
                     if (enemyAlive && Math.abs(localPos.x) < 60 && Math.abs(localPos.z) < 280 && localPos.y < 80 && localPos.y > -20) {
                         sysAudio('explode'); screenShake = 20.0; triggerParticleEvent(b.mesh.position, 'explosion', 35);
                         scene.remove(b.mesh); bombs.splice(i, 1); damageEnemy(3.0);
+                        continue;
+                    }
+                    
+                    // Check jet hits
+                    for (let jet of enemyJets) {
+                        if (jet.alive && b.mesh.position.distanceTo(jet.position) < 30) {
+                            sysAudio('explode'); triggerParticleEvent(jet.position, 'explosion', 20);
+                            jet.alive = false; scene.remove(jet);
+                            scene.remove(b.mesh); bombs.splice(i, 1);
+                            if (lockedTarget === jet) { isTargetLocked = false; lockedTarget = null; }
+                            break;
+                        }
                     }
                 }
 
-                if (enemyAlive) {
-                    const shipPos2D = enemyShip.position.clone(); shipPos2D.y += 30; shipPos2D.project(camera);
+                if (enemyAlive || enemyJets.some(j => j.alive)) {
                     const lockUI = document.getElementById('lockOnUI');
-                    if (isTargetLocked && shipPos2D.z < 1) {
-                        const x = (shipPos2D.x * .5 + .5) * window.innerWidth; const y = (-(shipPos2D.y * .5) + .5) * window.innerHeight;
-                        lockUI.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`; lockUI.style.display = 'block';
-                    } else { lockUI.style.display = 'none'; }
+                    if (isTargetLocked && lockedTarget && (lockedTarget === enemyShip ? enemyAlive : lockedTarget.alive)) {
+                        const targetPos2D = lockedTarget.position.clone();
+                        if (lockedTarget === enemyShip) targetPos2D.y += 30;
+                        targetPos2D.project(camera);
+                        if (targetPos2D.z < 1) {
+                            const x = (targetPos2D.x * .5 + .5) * window.innerWidth; const y = (-(targetPos2D.y * .5) + .5) * window.innerHeight;
+                            lockUI.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%)`; lockUI.style.display = 'block';
+                        } else { lockUI.style.display = 'none'; }
+                    } else { lockUI.style.display = 'none'; isTargetLocked = false; lockedTarget = null; }
 
                     enemyJets.forEach(jet => {
                         if (!jet.alive) return;
