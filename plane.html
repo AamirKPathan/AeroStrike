@@ -1050,7 +1050,14 @@
             playerHp = Math.min(playerMaxHp, playerHp + 30);
             document.getElementById('hpBar').style.width = (playerHp / playerMaxHp) * 100 + '%';
             resetToCarrier(); respawnEnemy(); gameState = "playing";
-            enemyJets.push(createEnemyJet());
+            // Spawn more jets each level
+            let jetCount = Math.min(1 + Math.floor(level / 2), 6); // caps at 6 jets
+            enemyJets = [];
+
+            for (let i = 0; i < jetCount; i++) {
+                enemyJets.push(createEnemyJet());
+            }
+
         }
 
         function animate() {
