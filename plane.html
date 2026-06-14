@@ -1114,16 +1114,41 @@
                 }
 
                 if (planeGrp.position.y <= groundY) {
-                    planeGrp.position.y = groundY; isGrounded = true;
-                    document.getElementById('gearText').innerText = "DOWN";
-                    const eul = new THREE.Euler().setFromQuaternion(planeGrp.quaternion, 'YXZ');
-                    eul.x *= 0.8; planeGrp.quaternion.setFromEuler(eul);
-                    if (!onDeck) triggerCrash("DITCHED IN OCEAN");
-                    else if (onDeck && (vertVel < -0.4 || speed > 2.0 && planeGrp.position.z < -650)) triggerCrash("DECK CRASH");
-                } else {
-                    isGrounded = false; document.getElementById('gearText').innerText = "UP";
-                    planeGrp.position.y += vertVel;
-                }
+    planeGrp.position.y = groundY; 
+    isGrounded = true;
+
+    // AUTO GEAR TEXT
+    document.getElementById('gearText').innerText = "DOWN";
+
+    // REARMING GOES RIGHT HERE
+    if (onDeck) {
+        bombCount = 10;
+        playerHp = playerMaxHp;
+
+        document.getElementById('hpBar').style.width = '100%';
+        document.getElementById('bombText').innerText = bombCount + " / 10";
+
+        document.getElementById('objectiveHud').innerText = "REARMING COMPLETE";
+        setTimeout(() => {
+            document.getElementById('objectiveHud').innerText = "OBJECTIVE: ENGAGE HOSTILES";
+        }, 2000);
+    }
+
+    // TOUCHDOWN ROTATION
+    const eul = new THREE.Euler().setFromQuaternion(planeGrp.quaternion, 'YXZ');
+    eul.x *= 0.8; 
+    planeGrp.quaternion.setFromEuler(eul);
+
+    // CRASH CHECKS
+    if (!onDeck) triggerCrash("DITCHED IN OCEAN");
+    else if (onDeck && (vertVel < -0.4 || speed > 2.0 && planeGrp.position.z < -650)) triggerCrash("DECK CRASH");
+
+} else {
+    isGrounded = false; 
+    document.getElementById('gearText').innerText = "UP";
+    planeGrp.position.y += vertVel;
+}
+
 
                 enemyShip.updateMatrixWorld();
 
