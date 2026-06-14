@@ -1050,6 +1050,12 @@
             playerHp = Math.min(playerMaxHp, playerHp + 30);
             document.getElementById('hpBar').style.width = (playerHp / playerMaxHp) * 100 + '%';
             resetToCarrier(); respawnEnemy(); gameState = "playing";
+            // Remove old jet radar blips
+            enemyJets.forEach((_, index) => {
+                const old = document.getElementById('jetBlip' + index);
+                if (old) old.remove();
+            });
+
             // Spawn more jets each level
             let jetCount = Math.min(1 + Math.floor(level / 2), 6); // caps at 6 jets
             enemyJets = [];
