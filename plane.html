@@ -1166,21 +1166,21 @@
                 for (let i = bombs.length - 1; i >= 0; i--) {
                     let b = bombs[i];
                     // === ENEMY SHIP / CARRIER HIT DETECTION ===
-                if (enemyShip && b.position.distanceTo(enemyShip.position) < 120) {
+                    if (enemyShip && b.position.distanceTo(enemyShip.position) < 120) {
 
-                    carrierHp--; // or enemyShipHp-- if you prefer
+                        carrierHp--; // or enemyShipHp-- if you prefer
 
-                    triggerParticleEvent(b.position, 'explosion', 40);
+                        triggerParticleEvent(b.position, 'explosion', 40);
 
-                    scene.remove(b);
-                    bombs.splice(i, 1);
+                        scene.remove(b);
+                        bombs.splice(i, 1);
 
-                    if (carrierHp <= 0) {
-                        destroyEnemyShip(); // you can define this
+                        if (carrierHp <= 0) {
+                            destroyEnemyShip(); // you can define this
+                        }
+
+                        continue;
                     }
-
-                    continue;
-                }
 
                     // SLIGHT AIM ASSIST LOGIC
                     if (b.isHoming && enemyAlive) {
