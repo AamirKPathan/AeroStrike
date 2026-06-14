@@ -625,36 +625,36 @@
             enemyShip.updateMatrixWorld();
             document.getElementById('enemyBlip').style.display = 'block';
             // === RADAR BLIPS FOR ENEMY JETS ===
-enemyJets.forEach((jet, index) => {
-    let blip = document.getElementById('jetBlip' + index);
+            enemyJets.forEach((jet, index) => {
+                let blip = document.getElementById('jetBlip' + index);
 
-    if (!blip) {
-        blip = document.createElement('div');
-        blip.id = 'jetBlip' + index;
-        blip.style.position = 'absolute';
-        blip.style.width = '6px';
-        blip.style.height = '6px';
-        blip.style.background = '#00ff88';
-        blip.style.borderRadius = '50%';
-        blip.style.boxShadow = '0 0 8px #00ff88';
-        document.getElementById('radarUI').appendChild(blip);
-    }
+                if (!blip) {
+                    blip = document.createElement('div');
+                    blip.id = 'jetBlip' + index;
+                    blip.style.position = 'absolute';
+                    blip.style.width = '6px';
+                    blip.style.height = '6px';
+                    blip.style.background = '#00ff88';
+                    blip.style.borderRadius = '50%';
+                    blip.style.boxShadow = '0 0 8px #00ff88';
+                    document.getElementById('radarUI').appendChild(blip);
+                }
 
-    const dx = jet.position.x - planeGrp.position.x;
-    const dz = jet.position.z - planeGrp.position.z;
+                const dx = jet.position.x - planeGrp.position.x;
+                const dz = jet.position.z - planeGrp.position.z;
 
-    const scale = 75 / 30000;
-    let rx = dx * scale;
-    let rz = dz * scale;
+                const scale = 75 / 30000;
+                let rx = dx * scale;
+                let rz = dz * scale;
 
-    const distUI = Math.sqrt(rx*rx + rz*rz);
-    if (distUI > 70) {
-        rx = (rx/distUI)*70;
-        rz = (rz/distUI)*70;
-    }
+                const distUI = Math.sqrt(rx*rx + rz*rz);
+                if (distUI > 70) {
+                    rx = (rx/distUI)*70;
+                    rz = (rz/distUI)*70;
+                }
 
-    blip.style.transform = `translate(${rx}px, ${rz}px)`;
-});
+                blip.style.transform = `translate(${rx}px, ${rz}px)`;
+            });
 
             document.getElementById('enemyHpBar').style.width = '100%';
             document.getElementById('lockOnUI').style.display = 'none';
