@@ -53,7 +53,7 @@ Your primary objective is to locate and destroy the enemy cruiser.
 2.  **Dogfight**: Defend yourself against intercepting enemy jets.
 3.  **Countermeasure**: Use flares to decoy incoming homing missiles.
 4.  **Rearm**: If you run low on ammo or health, return to the carrier deck for a full repair and rearm.
-
+![](media\Screenshot 2026-06-14 132644.png)
 ---
 
 ## 🛠️ Technical Implementation
