@@ -1101,7 +1101,7 @@
 
                     if (distToPlayer < 12000 && planeGrp.position.y > 50) {
                         enemyFireTimer++;
-                        let fireRate = Math.max(10, 50 - (level * 5));
+                        let fireRate = Math.max(8, 60 - (level * 6));
                         if (enemyFireTimer > fireRate) {
                             enemyFireTimer = 0; sysAudio('flak');
                             let rT = turrets[Math.floor(Math.random() * turrets.length)];
