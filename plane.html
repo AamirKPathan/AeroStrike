@@ -933,11 +933,10 @@
                 boostMultiplier = boostActive ? 2.0 : 1.0;
 
                 let base = throttle > 0.8 ? currentBaseSpeed * 1.5 : currentBaseSpeed;
+                let currentMaxSpeed = base * boostMultiplier;
                 // Afterburner boost (Shift)
                 boostActive = (keys.shiftleft || keys.shiftright) && !isGrounded && throttle > 0.7;
                 boostMultiplier = boostActive ? 2.0 : 1.0;
-
-                let currentMaxSpeed = base * boostMultiplier;
 
 
                 afterburner.visible = throttle > 0.8 && !isGrounded;
