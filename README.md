@@ -87,4 +87,4 @@ Your primary objective is to locate and destroy the enemy cruiser.
 *   **Accounts**: Accounts and leaderboard coming soon
 *   **Ground**: Ground based battles coming soon
 *   **Campaigns**: Proper story mode campaigns will emerge soon.
-*   **Multiplayer**: M 
+*   **Multiplayer**: Multiplayer combat and multiplayer co-op servers to be added. 
