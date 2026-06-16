@@ -415,7 +415,9 @@
 
         <div id="objectiveHud" class="hud-panel">
             <div class="hud-label" id="modeTitle" style="color:#ff3333;">MISSION: LEVEL <span id="lvlText">1</span></div>
-            <div class="hud-value" id="modeObjective" style="font-size: 22px;">SINK THE CRUISER</div>
+            <div class="hud-value" id="modeObjective" style="font-size: 22px; margin-bottom: 5px;">SINK THE CRUISER</div>
+            <div class="hud-label">SCORE</div>
+            <div class="hud-value" id="scoreText" style="font-size: 20px; color: #ffff00;">000000</div>
             <div class="bar-wrapper" style="height: 6px; border:none;">
                 <div class="enemy-health-bar" id="enemyHpBar"></div>
             </div>
@@ -431,6 +433,7 @@
         <div id="endScreen">
             <div id="endMessage">AIRCRAFT DESTROYED</div>
             <div id="endSub">MISSION FAILED</div>
+            <div id="endScore" style="color: #ffff00; font-size: 24px; margin: 15px 0; letter-spacing: 0.1em;">SCORE: 000000</div>
             <button class="btn-mission" onclick="location.reload()" style="margin-top: 20px;">RETRY MISSION</button>
         </div>
 
@@ -442,6 +445,7 @@
         <div id="levelScreen">
             <div id="levelMessage">TARGET SINKING</div>
             <div id="levelSub">PREPARE FOR NEXT SORTIE</div>
+            <div id="levelScore" style="color: #ffff00; font-size: 24px; margin: 15px 0; letter-spacing: 0.1em;">SCORE: 000000</div>
         </div>
 
         <div id="flightHud" class="hud-panel">
@@ -461,6 +465,8 @@
             </div>
             <div class="hud-label">MISSILES</div>
             <div class="hud-value" id="bombText" style="color: #ffaa00; font-size:26px; margin-bottom:10px;">10 / 10</div>
+            <div class="hud-label">FLARES</div>
+            <div class="hud-value" id="flareText" style="color: #ffcc00; font-size:26px; margin-bottom:10px;">10 / 10</div>
             <div class="hud-label">GEAR</div>
             <div class="hud-value" id="gearText" style="font-size:20px;">DOWN</div>
         </div>
@@ -650,7 +656,7 @@
             
             // RANDOM SPAWN POSITION
             const spawnAngle = Math.random() * Math.PI * 2;
-            const spawnDist = 8000 + Math.random() * 4000;
+            const spawnDist = 4000 + Math.random() * 2000;
             jet.position.set(Math.cos(spawnAngle) * spawnDist, 1000 + Math.random() * 1000, Math.sin(spawnAngle) * spawnDist);
             
             jet.alive = true;
@@ -770,8 +776,14 @@
         let enemyJets = []; let enemyMissiles = [];
         let carrierMissiles = []; let carrierFireTimer = 0;
         let warningCooldown = 0; let flares = [];
+        let flareCount = 10;
+        let score = 0;
         let isPaused = false;
         let bombs = []; let bombCount = 10;
+        let playerDisorientedTimer = 0;
+        let playerTurnCount = 0;
+        let playerLastTurnDir = 0;
+        let lastEnemyMissileTime = 0;
         let bullets = []; let enemyBullets = [];
         let gunCooldown = 0; let enemyFireTimer = 0; let cruiserMissileTimer = 0;
         const flightDeckY = 41.5;
@@ -781,12 +793,12 @@
         window.onkeydown = e => { if (keys[e.code.toLowerCase()] !== undefined) keys[e.code.toLowerCase()] = 1; };
         window.onkeyup = e => {
             if (keys[e.code.toLowerCase()] !== undefined) keys[e.code.toLowerCase()] = 0;
-            if (e.code === 'Space' && gameState === 'playing' && bombCount > 0) fireMissile();
+            if (e.code === 'Space' && gameState === 'playing' && bombCount > 0 && playerDisorientedTimer <= 0) fireMissile();
             if (e.code === "KeyP" && gameState === "playing") {
                 isPaused = !isPaused;
                 document.getElementById('pauseScreen').style.display = isPaused ? 'flex' : 'none';
             }
-            if (e.code === "KeyF" && gameState === "playing") dropFlares();
+            if (e.code === "KeyF" && gameState === "playing" && flareCount > 0) dropFlares();
         };
 
         const raycaster = new THREE.Raycaster(); const mouse = new THREE.Vector2();
@@ -837,9 +849,15 @@
         }
 
         function fireEnemyMissile(origin) {
+            const now = Date.now();
+            if (now - lastEnemyMissileTime < 10000) return; // 10s cooldown
+            lastEnemyMissileTime = now;
+
             const missile = new THREE.Group();
-            const body = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 6, 8).rotateX(Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xff2222 }));
-            missile.add(body);
+            const body = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 4).rotateX(Math.PI / 2), new THREE.MeshStandardMaterial({ color: 0xff3333 }));
+            const tail = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1.5, 0.75), new THREE.MeshStandardMaterial({ color: 0x990000 }));
+            tail.position.set(0, 0, -2);
+            missile.add(body, tail);
             
             // Set position based on origin (jet or cruiser)
             if (origin === enemyShip) {
@@ -847,12 +865,12 @@
                 const rT = turrets[Math.floor(Math.random() * turrets.length)];
                 missile.position.setFromMatrixPosition(rT.matrixWorld);
                 const dir = planeGrp.position.clone().sub(missile.position).normalize();
-                enemyMissiles.push({ mesh: missile, vel: dir.multiplyScalar(18), life: 800 }); // Cruiser missiles are slightly slower but longer lived
+                enemyMissiles.push({ mesh: missile, vel: dir.multiplyScalar(18), life: 800, turnCount: 0, lastTurnDir: 0, isDisoriented: false }); // Cruiser missiles are slightly slower but longer lived
             } else {
                 missile.position.copy(origin.position); 
                 missile.quaternion.copy(origin.quaternion);
                 const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(origin.quaternion);
-                enemyMissiles.push({ mesh: missile, vel: forward.multiplyScalar(20), life: 600 });
+                enemyMissiles.push({ mesh: missile, vel: forward.multiplyScalar(20), life: 600, turnCount: 0, lastTurnDir: 0, isDisoriented: false });
             }
             scene.add(missile);
             sysAudio('launch');
@@ -870,7 +888,11 @@
             sysAudio('launch');
         }
 
+
+
         function dropFlares() {
+            flareCount--;
+            document.getElementById('flareText').innerText = `${flareCount} / 10`;
             for (let i = 0; i < 8; i++) {
                 const flare = new THREE.Mesh(new THREE.SphereGeometry(1.5, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffaa00, transparent: true }));
                 flare.position.copy(planeGrp.position);
@@ -885,6 +907,11 @@
             setTimeout(() => fx.style.opacity = 0, 100);
         }
 
+        function updateScore(amount) {
+            score += Math.floor(amount);
+            document.getElementById('scoreText').innerText = score.toString().padStart(6, '0');
+        }
+
         function damageEnemy(amount, isKamikaze = false) {
             if (!enemyAlive) return;
             enemyHp -= amount;
@@ -895,9 +922,13 @@
                 document.getElementById('lockOnUI').style.display = 'none';
                 if (!isKamikaze) { screenShake = 40.0; triggerParticleEvent(enemyShip.position, 'explosion', 80); }
                 if (gameState === "playing" && !isKamikaze) {
+                    updateScore(2000); // 2000 points for sinking the cruiser
+                    const flareBonus = flareCount * 100; // 100 points per conserved flare
+                    updateScore(flareBonus);
                     setTimeout(() => {
                         gameState = "levelTransition";
                         document.getElementById('levelScreen').style.display = 'flex';
+                        document.getElementById('levelScore').innerText = "SCORE: " + score.toString().padStart(6, '0');
                         setTimeout(nextLevel, 3000);
                     }, 2000);
                 }
@@ -908,12 +939,13 @@
             sysAudio('click');
             document.getElementById('startScreen').style.display = 'none';
             document.getElementById('gameUI').style.display = 'block';
-            level = 1; playerHp = playerMaxHp; document.getElementById('hpBar').style.width = '100%';
+            level = 1; playerHp = playerMaxHp; score = 0; updateScore(0);
+            document.getElementById('hpBar').style.width = '100%';
             resetToCarrier(); 
             
             enemyJets.forEach(jet => scene.remove(jet));
             enemyJets = [];
-            enemyJets.push(createEnemyJet());
+            createEnemyJet(); // Function already handles pushing to array
             
             respawnEnemy(); 
             gameState = "playing";
@@ -923,7 +955,9 @@
             planeGrp.position.set(0, flightDeckY, 500);
             planeGrp.rotation.set(0, 0, 0); planeGrp.quaternion.identity();
             throttle = 0; speed = 0; isGrounded = true; planeGrp.visible = true;
-            bombCount = 10; document.getElementById('bombText').innerText = `10 / 10`;
+            bombCount = 10; flareCount = 10;
+            document.getElementById('bombText').innerText = `10 / 10`;
+            document.getElementById('flareText').innerText = `10 / 10`;
             bombs.forEach(b => scene.remove(b.mesh)); bombs = [];
             bullets.forEach(b => scene.remove(b.mesh)); bullets = [];
             enemyBullets.forEach(b => scene.remove(b.mesh)); enemyBullets = [];
@@ -946,7 +980,7 @@
             enemyJets.forEach(jet => scene.remove(jet));
             enemyJets = [];
             let jetCount = Math.min(1 + Math.floor(level / 2), 6);
-            for (let i = 0; i < jetCount; i++) enemyJets.push(createEnemyJet());
+            for (let i = 0; i < jetCount; i++) createEnemyJet(); // Function already handles pushing to array
         }
 
         function triggerCrash(reason, isKamikaze = false) {
@@ -969,6 +1003,7 @@
                 setTimeout(() => {
                     document.getElementById('endScreen').style.display = 'flex';
                     document.getElementById('endSub').innerText = reason;
+                    document.getElementById('endScore').innerText = "SCORE: " + score.toString().padStart(6, '0');
                 }, 2000);
             }
         }
@@ -980,21 +1015,41 @@
 
             if (gameState === "playing") {
                 if (isPaused) { renderer.render(scene, camera); return; }
-                if (keys.keyw) throttle = Math.min(1.0, throttle + 0.005);
-                if (keys.keys) throttle = Math.max(0.0, throttle - 0.01);
-                let currentMaxSpeed = throttle > 0.8 ? currentBaseSpeed * 1.5 : currentBaseSpeed;
-                speed += ((throttle * currentMaxSpeed) - speed) * 0.015;
-                afterburner.visible = throttle > 0.8 && !isGrounded;
-                if (afterburner.visible) afterburner.scale.set(1, 1 + Math.random() * 0.5, 1);
+                
+                // PLAYER DISORIENTATION LOGIC
+                if (playerDisorientedTimer > 0) {
+                    playerDisorientedTimer--;
+                    speed *= 0.98; // Slow down significantly
+                    planeGrp.rotateOnAxis(yAxis, 0.01); // Spin aimlessly
+                    planeGrp.rotateOnAxis(xAxis, 0.005);
+                } else {
+                    if (keys.keyw) throttle = Math.min(1.0, throttle + 0.005);
+                    if (keys.keys) throttle = Math.max(0.0, throttle - 0.01);
+                    let currentMaxSpeed = throttle > 0.8 ? currentBaseSpeed * 1.5 : currentBaseSpeed;
+                    speed += ((throttle * currentMaxSpeed) - speed) * 0.015;
+                    
+                    const currentTurnDir = (keys.keya || keys.arrowleft) ? 1 : ((keys.keyd || keys.arrowright) ? -1 : 0);
+                    if (currentTurnDir !== 0 && currentTurnDir !== playerLastTurnDir) {
+                        playerTurnCount++;
+                        playerLastTurnDir = currentTurnDir;
+                        if (playerTurnCount > 6) { // High turn series
+                            playerDisorientedTimer = 300; // 5 seconds at 60fps
+                            playerTurnCount = 0;
+                        }
+                    }
 
-                if (speed > 0.1) {
-                    if (keys.keya || keys.arrowleft) planeGrp.rotateOnAxis(yAxis, 0.02);
-                    if (keys.keyd || keys.arrowright) planeGrp.rotateOnAxis(yAxis, -0.02);
+                    if (speed > 0.1) {
+                        if (keys.keya || keys.arrowleft) planeGrp.rotateOnAxis(yAxis, 0.02);
+                        if (keys.keyd || keys.arrowright) planeGrp.rotateOnAxis(yAxis, -0.02);
+                    }
+                    if (speed > 1.2 || !isGrounded) {
+                        if (keys.arrowup) planeGrp.rotateOnAxis(xAxis, 0.025);
+                        if (keys.arrowdown) planeGrp.rotateOnAxis(xAxis, -0.025);
+                    }
                 }
-                if (speed > 1.2 || !isGrounded) {
-                    if (keys.arrowup) planeGrp.rotateOnAxis(xAxis, 0.025);
-                    if (keys.arrowdown) planeGrp.rotateOnAxis(xAxis, -0.025);
-                }
+                
+                afterburner.visible = throttle > 0.8 && !isGrounded && playerDisorientedTimer <= 0;
+                if (afterburner.visible) afterburner.scale.set(1, 1 + Math.random() * 0.5, 1);
                 planeGrp.translateZ(-speed);
                 let vertVel = (speed * 0.015) - 0.04;
                 let waveHeight = Math.sin(planeGrp.position.x * 0.01 + time) * 6 + Math.cos(planeGrp.position.z * 0.015 + time * 1.2) * 6;
@@ -1008,9 +1063,10 @@
                     planeGrp.position.y = groundY; isGrounded = true;
                     document.getElementById('gearText').innerText = "DOWN";
                     if (onDeck) {
-                        bombCount = 10; playerHp = playerMaxHp;
+                        bombCount = 10; flareCount = 10; playerHp = playerMaxHp;
                         document.getElementById('hpBar').style.width = '100%';
                         document.getElementById('bombText').innerText = bombCount + " / 10";
+                        document.getElementById('flareText').innerText = flareCount + " / 10";
                     }
                     const eul = new THREE.Euler().setFromQuaternion(planeGrp.quaternion, 'YXZ');
                     eul.x *= 0.8; planeGrp.quaternion.setFromEuler(eul);
@@ -1058,6 +1114,7 @@
                         if (jet.alive && b.mesh.position.distanceTo(jet.position) < 30) {
                             sysAudio('explode'); triggerParticleEvent(jet.position, 'explosion', 20);
                             jet.alive = false; scene.remove(jet);
+                            updateScore(500); // 500 points for destroying a jet
                             scene.remove(b.mesh); bombs.splice(i, 1);
                             if (lockedTarget === jet) { isTargetLocked = false; lockedTarget = null; }
                             break;
@@ -1065,20 +1122,7 @@
                     }
                 }
 
-                // CARRIER DEFENSE SYSTEM
-                carrierFireTimer++;
-                if (carrierFireTimer > 180) { // Check every 3 seconds
-                    carrierFireTimer = 0;
-                    let closestJet = null;
-                    let minDist = 8000; // Max defense range
-                    enemyJets.forEach(jet => {
-                        if (jet.alive) {
-                            let d = jet.position.distanceTo(carrierGrp.position);
-                            if (d < minDist) { minDist = d; closestJet = jet; }
-                        }
-                    });
-                    if (closestJet) fireCarrierMissile(closestJet);
-                }
+
 
                 if (enemyAlive || enemyJets.some(j => j.alive)) {
                     const lockUI = document.getElementById('lockOnUI');
@@ -1096,7 +1140,7 @@
                         if (!jet.alive) return;
                         
                         const toPlayer = planeGrp.position.clone().sub(jet.position);
-                        const dist = toPlayer.length();
+                        const dist = toPlayer.length() + 0.01;
                         
                         // DISORIENTATION LOGIC
                         const currentTurnDir = (keys.keya || keys.arrowleft) ? 1 : ((keys.keyd || keys.arrowright) ? -1 : 0);
@@ -1123,11 +1167,14 @@
                                 const targetZ = jet.patrolCenter.z + Math.sin(jet.patrolAngle) * jet.patrolRadius;
                                 const patrolTarget = new THREE.Vector3(targetX, jet.patrolCenter.y, targetZ);
                                 
-                                const desiredDir = patrolTarget.sub(jet.position).normalize();
+                                const diff = patrolTarget.sub(jet.position);
+                                const desiredDir = diff.normalize();
+                                if (diff.length() < 50) jet.patrolAngle += 0.2; // Move target if reached
                                 const currentDir = new THREE.Vector3(0, 0, -1).applyQuaternion(jet.quaternion);
-                                const newDir = currentDir.lerp(desiredDir, 0.02).normalize();
+                                const newDir = currentDir.lerp(desiredDir, 0.05).normalize();
                                 jet.lookAt(jet.position.clone().add(newDir));
-                                jet.translateZ(-2.0);
+                                jet.rotateY(Math.PI); // Correct orientation: nose is at -Z
+                                jet.translateZ(-3.5); // Increased speed
                                 
                                 // SWITCH TO DOGFIGHT IF PLAYER IN RADIUS (3000 units)
                                 if (dist < 3000) jet.state = "dogfight";
@@ -1135,9 +1182,10 @@
                                 // DOGFIGHTING
                                 const desiredDir = toPlayer.normalize();
                                 const currentDir = new THREE.Vector3(0, 0, -1).applyQuaternion(jet.quaternion);
-                                const newDir = currentDir.lerp(desiredDir, 0.02).normalize();
+                                const newDir = currentDir.lerp(desiredDir, 0.06).normalize();
                                 jet.lookAt(jet.position.clone().add(newDir));
-                                jet.translateZ(-2.5);
+                                jet.rotateY(Math.PI); // Correct orientation: nose is at -Z
+                                jet.translateZ(-4.5); // Increased speed
                                 
                                 if (dist < 1500 && Math.random() < 0.01) fireEnemyMissile(jet);
                                 
@@ -1231,17 +1279,33 @@
 
                 for (let i = enemyMissiles.length - 1; i >= 0; i--) {
                     let m = enemyMissiles[i];
-                    let currentTargetPos = planeGrp.position.clone();
-                    let closestFlareDist = Infinity;
-                    for (let f of flares) {
-                        let d = m.mesh.position.distanceTo(f.mesh.position);
-                        if (d < 500 && d < closestFlareDist) {
-                            closestFlareDist = d;
-                            currentTargetPos = f.mesh.position.clone();
-                        }
+                    if (Math.random() > 0.3) triggerParticleEvent(m.mesh.position, 'smoke', 4);
+                    
+                    // MISSILE DISORIENTATION LOGIC
+                    const currentTurnDir = (keys.keya || keys.arrowleft) ? 1 : ((keys.keyd || keys.arrowright) ? -1 : 0);
+                    if (currentTurnDir !== 0 && currentTurnDir !== m.lastTurnDir && m.mesh.position.distanceTo(planeGrp.position) < 1000) {
+                        m.turnCount++;
+                        m.lastTurnDir = currentTurnDir;
+                        if (m.turnCount > 3) m.isDisoriented = true; // Lose tracking after 4 evasion turns
                     }
-                    const targetDir = currentTargetPos.sub(m.mesh.position).normalize();
-                    m.vel.lerp(targetDir.multiplyScalar(25), 0.05);
+
+                    let currentTargetPos = planeGrp.position.clone();
+                    if (m.isDisoriented) {
+                        // Fly straight/randomly
+                        m.life--;
+                    } else {
+                        let closestFlareDist = Infinity;
+                        for (let f of flares) {
+                            let d = m.mesh.position.distanceTo(f.mesh.position);
+                            if (d < 500 && d < closestFlareDist) {
+                                closestFlareDist = d;
+                                currentTargetPos = f.mesh.position.clone();
+                            }
+                        }
+                        const targetDir = currentTargetPos.sub(m.mesh.position).normalize();
+                        m.vel.lerp(targetDir.multiplyScalar(25), 0.05);
+                    }
+                    
                     m.mesh.position.add(m.vel); m.mesh.lookAt(m.mesh.position.clone().add(m.vel));
                     if (warningCooldown <= 0 && m.mesh.position.distanceTo(planeGrp.position) < 300) {
                         sysAudio('lock');
@@ -1262,6 +1326,21 @@
                     }
                 }
 
+                // CARRIER DEFENSE SYSTEM
+                carrierFireTimer++;
+                if (carrierFireTimer > 180) { // Check every 3 seconds
+                    carrierFireTimer = 0;
+                    let closestJet = null;
+                    let minDist = 8000; // Max defense range
+                    enemyJets.forEach(jet => {
+                        if (jet.alive) {
+                            let d = jet.position.distanceTo(carrierGrp.position);
+                            if (d < minDist) { minDist = d; closestJet = jet; }
+                        }
+                    });
+                    if (closestJet) fireCarrierMissile(closestJet);
+                }
+
                 // UPDATE CARRIER MISSILES
                 for (let i = carrierMissiles.length - 1; i >= 0; i--) {
                     let m = carrierMissiles[i];
@@ -1280,9 +1359,8 @@
                     for (let jet of enemyJets) {
                         if (jet.alive && m.mesh.position.distanceTo(jet.position) < 30) {
                             sysAudio('explode'); triggerParticleEvent(jet.position, 'explosion', 25);
-                            jet.alive = false; scene.remove(jet);
+                            // jet.alive = false; // CARRIER MISSILES DO 0 DAMAGE
                             scene.remove(m.mesh); carrierMissiles.splice(i, 1);
-                            if (lockedTarget === jet) { isTargetLocked = false; lockedTarget = null; }
                             break;
                         }
                     }
@@ -1292,14 +1370,15 @@
                 document.getElementById('throttleBar').style.background = throttle > 0.8 ? '#00ccff' : '#00ff88';
                 document.getElementById('spdText').innerText = Math.floor(speed * 120).toString().padStart(3, '0');
                 document.getElementById('altText').innerText = Math.max(0, Math.floor((planeGrp.position.y - waveHeight) * 10)).toString().padStart(4, '0');
-                const isStalling = (!isGrounded && speed < 1.5 && planeGrp.position.y > 50);
+                const isStalling = (!isGrounded && speed < 1.5 && planeGrp.position.y > 50) || playerDisorientedTimer > 0;
+                document.getElementById('warningText').innerText = playerDisorientedTimer > 0 ? "DISORIENTED" : "STALL WARNING";
                 document.getElementById('warningText').style.opacity = isStalling ? 1 : 0;
                 let targetFov = keys.keyz ? 25 : 60; camera.fov += (targetFov - camera.fov) * 0.1; camera.updateProjectionMatrix();
             }
 
             if (gameState === "playing" || gameState === "levelTransition") {
-                const offset = new THREE.Vector3(0, 25, 65).applyMatrix4(planeGrp.matrixWorld);
-                camera.position.lerp(offset, 0.1); const look = planeGrp.position.clone(); look.y += 10; camera.lookAt(look);
+                const offset = new THREE.Vector3(0, 5, 25).applyMatrix4(planeGrp.matrixWorld);
+                camera.position.lerp(offset, 0.1); const look = new THREE.Vector3(0, 2, -10).applyMatrix4(planeGrp.matrixWorld); camera.lookAt(look);
             } else if (gameState === "menu") {
                 camera.position.set(100, 80, 250); camera.lookAt(0, 40, 0);
             }
