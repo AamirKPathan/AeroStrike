@@ -83,6 +83,6 @@ Your primary objective is to locate and destroy the enemy cruiser.
 ---
 
 ## 🤫 Upcoming
-*   **Openworld**: Powered by **Three.js** for high-performance WebGL 3D rendering.
+*   **Openworld**: No level, pure fun, 
 *   **FX**: Custom particle systems for explosions, engine exhaust, and smoke trails.
 *   **Audio**: Synthesized real-time audio for engine, combat, and warning systems.
