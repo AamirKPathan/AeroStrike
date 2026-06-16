@@ -84,5 +84,5 @@ Your primary objective is to locate and destroy the enemy cruiser.
 
 ## 🤫 Upcoming
 *   **Openworld**: No level, pure fun, rack up points and get your name on the leaderboard.
-*   **Accounts**: Custom particle systems for explosions, engine exhaust, and smoke trails.
-*   **Audio**: Synthesized real-time audio for engine, combat, and warning systems.
+*   **Accounts**: Accounts and leaderboard coming soon
+*   **Ground**: Synthesized real-time audio for engine, combat, and warning systems.
