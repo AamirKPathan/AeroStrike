@@ -86,4 +86,4 @@ Your primary objective is to locate and destroy the enemy cruiser.
 *   **Openworld**: No level, pure fun, rack up points and get your name on the leaderboard.
 *   **Accounts**: Accounts and leaderboard coming soon
 *   **Ground**: Ground based battles coming soon
-*   **Ground**: Ground based battles coming soon
+*   **Campaings**: Proper story mo
